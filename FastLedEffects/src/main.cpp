@@ -20,8 +20,16 @@ void loop() {
   // FastLedEffects::rainbowStatic(leds);
   // FastLedEffects::hueFading(30, leds);
   // CRGBPalette16 myPal = purplePalette;
-  CRGBPalette16 myPal = heatmap_gp;
+  CRGBPalette16 myPal = purplePalette;
   // FastLedEffects::hueWhiteWave(141, 50, leds);
   // FastLedEffects::movingPaletteLinear(myPal, 10, leds);
-  FastLedEffects::spotlightingPalette(myPal, 50, 10, leds);
+  // FastLedEffects::spotlightingPalette(myPal, 500, 1, leds);
+  // FastLedEffects::sinBeat8(255, 141, 22, 10, 30, leds);
+  // FastLedEffects::twoSinBeat8(0,0,255, 255,0,0, 1, 30,leds);
+  // FastLedEffects::brightnessSinBeat8Palette(myPal, 30, 30, leds);
+  // FastLedEffects::funkyRainbowSinBeat8(10, leds);
+  // FastLedEffects::funkyRangeSinBeat8Two(10, CRGB::Red, leds);
+  // FastLedEffects::movingFunkyPalette(myPal,45,30, leds);
+  // FastLedEffects::rainbowWave(5, 3, leds);
+  FastLedEffects::choosenWave(5, 3, CRGB::Blue, leds);
 }
