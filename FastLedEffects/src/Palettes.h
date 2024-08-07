@@ -12,26 +12,18 @@ DEFINE_GRADIENT_PALETTE(heatmap_gp) {
 };
 
 CRGBPalette16 purplePalette = CRGBPalette16 {
-    CRGB::DarkViolet,
-    CRGB::DarkViolet,
-    CRGB::DarkViolet,
-    CRGB::DarkViolet,
-
-    CRGB::Magenta,
-    CRGB::Magenta,
-    CRGB::Linen,
-    CRGB::Linen,
-
-    CRGB::Magenta,
-    CRGB::Magenta,
-    CRGB::DarkViolet,
-    CRGB::DarkViolet,
-
-    CRGB::DarkViolet,
-    CRGB::DarkViolet,
-    CRGB::Linen,
-    CRGB::Linen
+    CRGB::DarkViolet, CRGB::DarkViolet, CRGB::DarkViolet, CRGB::DarkViolet,
+    CRGB::Magenta, CRGB::Magenta,CRGB::Linen, CRGB::Linen,
+    CRGB::Magenta, CRGB::Magenta, CRGB::DarkViolet, CRGB::DarkViolet,
+    CRGB::DarkViolet, CRGB::DarkViolet, CRGB::Linen, CRGB::Linen
 };
+
+CRGBPalette16 lavaPalette = CRGBPalette16 {
+    CRGB::DarkRed, CRGB::Maroon, CRGB::DarkRed, CRGB::Maroon,
+    CRGB::DarkRed, CRGB::Maroon, CRGB::DarkRed, CRGB::DarkRed,
+    CRGB::DarkRed, CRGB::DarkRed, CRGB::Red, CRGB::Orange,
+    CRGB::White, CRGB::Orange, CRGB::Red, CRGB::DarkRed,
+}
 
 
 #endif

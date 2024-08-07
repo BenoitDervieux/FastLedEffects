@@ -18,6 +18,15 @@ static uint8_t hue = 0;
 // Moving Palette
 static uint8_t paletteIndex = 0;
 
+// First Noise
+static uint16_t x = 0;
+static int scale = 10;
+static uint16_t t = 0;
+
+// Noise palette
+static uint16_t brightnessScale = 150;
+static uint16_t indexScale = 20;
+
 // Add link to fastLed : 
 // Add link to video : https://www.youtube.com/watch?v=4Ut4UK7612M&list=PLgXkGn3BBAGi5dTOCuEwrLuFtfz0kGFTC&index=2
 void FastLedEffects::fill(int r, int g, int b, CRGB leds[]) {
@@ -282,8 +291,46 @@ void FastLedEffects::choosenWave(int milliseconds, int fade, CRGB color, CRGB le
     FastLED.show();
 }
 
+void FastLedEffects::firstNoiseRainbow(int bpm, CRGB leds[]) {
+    x = 0;
+    scale = beatsin8(bpm, 10, 30); // bpm
+    t = millis() / 5;
+    for (int i = 0; i < NUM_LEDS; i++) {
+        uint8_t noise = inoise8(i * scale + x, t);
+        uint8_t huetest = map(noise, 50, 190, 0, 255); // Color type of hue
+        leds[i] = CHSV(huetest, 255, 255);
+    }
+    FastLED.show();
+}
 
+void FastLedEffects::firstNoiseColor(CRGB color, int bpm, CRGB leds[]) {
+    x = 0;
+    scale = beatsin8(bpm, 10, 30); // bpm
+    t = millis() / 5;
+    std::vector<uint8_t> colors = FastLedEffects::getArrayRangeValue(FastLedEffects::CRGBToInt(color));
+    for (int i = 0; i < NUM_LEDS; i++) {
+        uint8_t noise = inoise8(i * scale + x, t);
+        uint8_t huetest = map(noise, 50, 190, colors[0], colors[1]); // Color type of hue
+        leds[i] = CHSV(huetest, 255, 255);
+    }
+    FastLED.show();
+}
+
+void FastLedEffects::noisePalette(CRGBPalette16 palette, int scale, CRGB leds[]) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+        indexScale = scale;
+        uint8_t brightness = inoise8(i*brightnessScale, millis() / 5);
+        uint8_t index = inoise8(i*indexScale, millis() / 10);
+        leds[i] = ColorFromPalette(palette, index, brightness, LINEARBLEND);
+    }
+}
+
+
+// 
+// 
 // Utility functions
+//
+//
 uint32_t FastLedEffects::CRGBToInt(const CRGB& color) {
     return (static_cast<uint32_t>(color.r) << 16) |
            (static_cast<uint32_t>(color.g) << 8)  |

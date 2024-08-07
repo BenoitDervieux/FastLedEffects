@@ -20,7 +20,7 @@ void loop() {
   // FastLedEffects::rainbowStatic(leds);
   // FastLedEffects::hueFading(30, leds);
   // CRGBPalette16 myPal = purplePalette;
-  CRGBPalette16 myPal = purplePalette;
+  CRGBPalette16 myPal = lavaPalette;
   // FastLedEffects::hueWhiteWave(141, 50, leds);
   // FastLedEffects::movingPaletteLinear(myPal, 10, leds);
   // FastLedEffects::spotlightingPalette(myPal, 500, 1, leds);
@@ -31,5 +31,7 @@ void loop() {
   // FastLedEffects::funkyRangeSinBeat8Two(10, CRGB::Red, leds);
   // FastLedEffects::movingFunkyPalette(myPal,45,30, leds);
   // FastLedEffects::rainbowWave(5, 3, leds);
-  FastLedEffects::choosenWave(5, 3, CRGB::Blue, leds);
+  // FastLedEffects::choosenWave(5, 3, CRGB::Blue, leds);
+  // FastLedEffects::firstNoiseRainbow(30, leds);
+  FastLedEffects::noisePalette(myPal, 100, leds);
 }

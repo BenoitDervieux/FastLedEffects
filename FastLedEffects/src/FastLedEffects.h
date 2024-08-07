@@ -27,6 +27,9 @@ class FastLedEffects {
         static void movingFunkyPalette(CRGBPalette16 palette, int bpm1, int bpm2, CRGB leds[]);
         static void rainbowWave(int milliseconds, int fade, CRGB leds[]);
         static void choosenWave(int milliseconds, int fade, CRGB color, CRGB leds[]);
+        static void firstNoiseRainbow(int bpm, CRGB leds[]);
+        static void firstNoiseColor(CRGB color, int bpm, CRGB leds[]);
+        static void noisePalette(CRGBPalette16 palette, int scale, CRGB leds[]);
     
 
 
