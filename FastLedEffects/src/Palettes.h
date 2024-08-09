@@ -22,8 +22,8 @@ CRGBPalette16 lavaPalette = CRGBPalette16 {
     CRGB::DarkRed, CRGB::Maroon, CRGB::DarkRed, CRGB::Maroon,
     CRGB::DarkRed, CRGB::Maroon, CRGB::DarkRed, CRGB::DarkRed,
     CRGB::DarkRed, CRGB::DarkRed, CRGB::Red, CRGB::Orange,
-    CRGB::White, CRGB::Orange, CRGB::Red, CRGB::DarkRed,
-}
+    CRGB::White, CRGB::Orange, CRGB::Red, CRGB::DarkRed
+};
 
 
 #endif

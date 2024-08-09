@@ -27,6 +27,8 @@ static uint16_t t = 0;
 static uint16_t brightnessScale = 150;
 static uint16_t indexScale = 20;
 
+
+
 // Add link to fastLed : 
 // Add link to video : https://www.youtube.com/watch?v=4Ut4UK7612M&list=PLgXkGn3BBAGi5dTOCuEwrLuFtfz0kGFTC&index=2
 void FastLedEffects::fill(int r, int g, int b, CRGB leds[]) {
@@ -321,16 +323,208 @@ void FastLedEffects::noisePalette(CRGBPalette16 palette, int scale, CRGB leds[])
         indexScale = scale;
         uint8_t brightness = inoise8(i*brightnessScale, millis() / 5);
         uint8_t index = inoise8(i*indexScale, millis() / 10);
-        leds[i] = ColorFromPalette(palette, index, brightness, LINEARBLEND);
+        leds[i] = ColorFromPalette(palette, index, brightness);
+    }
+    FastLED.show();
+}
+
+void FastLedEffects::runFire(CRGBPalette16 palette, CRGB leds[]) {
+    int a = millis();
+    for (int i = 0; i < NUM_LEDS; i++) {
+        uint8_t noise = inoise8(0, i * 60 + a, a / 3);
+        uint8_t math = abs8(i - (NUM_LEDS - 1) * 255 / (NUM_LEDS - 1));
+        uint8_t indexFire = qsub8(noise, math);
+        leds[i] = ColorFromPalette(palette, indexFire, 255, LINEARBLEND);
+    }
+    FastLED.show();
+}
+
+// Second Noise
+static uint8_t octaveVal = 2;
+static uint16_t xVal = 0;
+static int scaleVal = 50;
+static uint16_t timeVal = 0;
+static uint8_t noiseData[NUM_LEDS];
+
+void FastLedEffects::secondNoise(CRGBPalette16 palette, CRGB leds[]) {
+
+    timeVal = millis() / 4;
+    memset(noiseData, 0, NUM_LEDS);
+    fill_raw_noise8(noiseData, NUM_LEDS, octaveVal, xVal, scaleVal, timeVal);
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = ColorFromPalette(palette, noiseData[i], noiseData[NUM_LEDS - i - 1], LINEARBLEND);
+    }
+    FastLED.show();
+}
+
+// Fill Noise 16
+static uint8_t hue_octaves = 1;
+static uint16_t hue_x = 1;
+static int hue_scale = 50;
+
+void FastLedEffects::fillNoise16(CRGB leds[]) {
+    octaveVal = 1;
+    xVal = 0;
+    scaleVal = 100;
+    uint16_t ntime = millis() / 3;
+    uint8_t hue_shift = 5;
+    fill_noise16(leds, NUM_LEDS, octaveVal, xVal, scaleVal, hue_octaves, hue_x, hue_scale, ntime, hue_shift);
+    FastLED.show();
+}
+static uint8_t initialHue = 0;
+
+// Link : https://www.youtube.com/watch?v=r6vMdnqUjTk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=12
+void FastLedEffects::rainbowDave(int density, int delta, CRGB leds[]) {
+    // Here the density is the speed of the animation
+    fill_rainbow(leds, NUM_LEDS, initialHue += density, delta);
+    FastLED.show();
+}
+static unsigned long lastUpdate = 0;  // Store the last update time
+unsigned long interval = 0;   // Interval in milliseconds between updates
+// Link : https://www.youtube.com/watch?v=r6vMdnqUjTk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=12
+void FastLedEffects::marqueeDave(int inter, int hueChanging, int length, CRGB leds[]) {
+    static byte j = HUE_BLUE;
+    interval = inter;
+    static int scroll = 0;
+    if (millis() - lastUpdate >= interval) {
+        lastUpdate = millis();
+
+        j += 1;
+        byte k = j;
+
+        CRGB c;
+        for (int i = 0; i < NUM_LEDS; i++) {
+            leds[i] = c.setHue(k+=hueChanging);
+        }
+        
+        scroll++;
+        for (int i = scroll % length; i < NUM_LEDS; i+=length) {
+            leds[i] = CRGB::Black;
+        }
+        FastLED.show();
     }
 }
 
+// Would be good to make something more extended later
+#define NUM_COLORS 5
+static const CRGB TwinkleColors [NUM_COLORS] = {
+    CRGB::Red,
+    CRGB::Blue,
+    CRGB::Purple,
+    CRGB::Green,
+    CRGB::Orange
+};
+void FastLedEffects::twinkleOld(int inter, CRGB leds[]) {
+    interval = inter;
+    if (millis() - lastUpdate >= interval) {
+        lastUpdate = millis();
+        FastLED.clear(false);
+        for (int i = 0; i < NUM_LEDS / 2; i++) {
+            leds[random(NUM_LEDS)] = TwinkleColors[random(0, NUM_COLORS)];
+            FastLED.show();
+        }
+    }
+}
 
-// 
+void FastLedEffects::twinkle(int inter, CRGB leds[]) {
+    interval = inter;
+    if (millis() - lastUpdate >= interval) {
+        lastUpdate = millis();
+        static int passCount = 0;
+        passCount++;
+
+        if (passCount == NUM_LEDS) {
+            passCount = 0;
+            FastLED.clear(false);
+        }
+        leds[random(NUM_LEDS)] = TwinkleColors[random(0, NUM_COLORS)];
+        FastLED.show();
+    }
+}
+
+void FastLedEffects::comet(int inter, int fade, int cometsize,  int delathue, CRGB leds[]) {
+
+    byte fadeAmt = fade;
+    int cometSize = cometsize;
+    int deltaHue = delathue;
+
+    static byte hueByte = HUE_RED;  // Current comet color
+    static int iDirection = 1;      // Current direction
+    static int iPos = 0;    // Current comet positon on the strip
+
+     interval = inter;
+    if (millis() - lastUpdate >= interval) {
+        lastUpdate = millis();
+        hueByte += deltaHue;  //Update comet color
+        iPos += iDirection;  // Update comet position
+
+        // Flip the comet direction when it hits either end of the strip
+        if (iPos == (NUM_LEDS - cometSize) || iPos == 0) {
+            iDirection *= -1;
+        }
+
+        // Draw the comet at its current position
+        for (int i = 0; i < cometSize; i++) {
+            leds[iPos + i].setHue(hueByte);
+        }
+
+        // Fade the LEDS one step
+        for (int j = 0; j < NUM_LEDS; j++) {
+            if (random(2) == 1)
+                // leds[j] =leds[j].fadeToBlackBy(fadeAmt);
+                leds[j].fadeToBlackBy(fadeAmt);
+        }
+        FastLED.show();
+    }
+}
+
+void FastLedEffects::cometOnce(int inter, int fade, int cometsize,  int delathue,  double cometspeed, CRGB leds[]) {
+
+    byte fadeAmt = fade;
+    int cometSize = cometsize;
+    int deltaHue = delathue;
+    double cometSpeed = cometspeed;
+
+    static byte hueByte = HUE_RED;  // Current comet color
+    static int iDirection = 1;      // Current direction
+    static double iPos = 0.0;    // Current comet positon on the strip
+
+    interval = inter;
+    if (millis() - lastUpdate >= interval) {
+        lastUpdate = millis();
+        hueByte += deltaHue;  //Update comet color
+        iPos += iDirection * cometSpeed;  // Update comet position
+
+        // Flip the comet direction when it hits either end of the strip
+        if (iPos == (NUM_LEDS - cometSize) || iPos == 0) {
+            iDirection *= -1;
+        }
+
+        // Draw the comet at its current position
+        for (int i = 0; i < cometSize; i++) {
+            leds[(int)iPos + i].setHue(hueByte);
+        }
+
+        // Fade the LEDS one step
+        for (int j = 0; j < NUM_LEDS; j++) {
+            if (random(2) == 1)
+                // leds[j] =leds[j].fadeToBlackBy(fadeAmt);
+                leds[j].fadeToBlackBy(fadeAmt);
+        }
+        FastLED.show();
+    }
+}
+
+void FastLedEffects::bounce(CRGB leds[]) {
+    
+}
+
+
+//+---------------------------------------------------------------------------------
 // 
 // Utility functions
 //
-//
+//+---------------------------------------------------------------------------------
 uint32_t FastLedEffects::CRGBToInt(const CRGB& color) {
     return (static_cast<uint32_t>(color.r) << 16) |
            (static_cast<uint32_t>(color.g) << 8)  |
