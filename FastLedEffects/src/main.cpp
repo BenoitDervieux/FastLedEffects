@@ -3,7 +3,7 @@
 // File : main.cpp
 //  Description : List a series of functions found on the internet for the Fast Led library.
 // Makes them available for a static call for a bigger project.
-// History: 8/8/2024 - Updated last
+// History: 9/8/2024 - Updated last
 // Github: https://github.com/BenoitDervieux/FastLedEffects
 //+-------------------------------------------------------------------------------
 #include <Arduino.h>
@@ -15,7 +15,9 @@
 #define DATA_PIN_1 23
 
 CRGB leds[NUM_LEDS];
+
 void setup() {
+
   FastLED.addLeds<WS2812B, DATA_PIN_1, GRB>(leds, NUM_LEDS);
   FastLED.setBrightness(100);
   FastLED.show();
@@ -28,7 +30,6 @@ void loop() {
   // FastLedEffects::rainbowStatic(leds);
   // FastLedEffects::hueFading(30, leds);
   // CRGBPalette16 myPal = purplePalette;
-  CRGBPalette16 myPal = heatmap_gp;
   // FastLedEffects::hueWhiteWave(141, 50, leds);
   // FastLedEffects::movingPaletteLinear(myPal, 10, leds);
   // FastLedEffects::spotlightingPalette(myPal, 500, 1, leds);
@@ -45,5 +46,10 @@ void loop() {
   // FastLedEffects::runFire(myPal, leds);
   // FastLedEffects::secondNoise(myPal, leds);
   // FastLedEffects::marqueeDave(100, 8, 2, leds);
-  FastLedEffects::cometOnce(20, 128, 1, 5, 0.5, leds);
+  // FastLedEffects::cometOnce(20, 128, 1, 5, 0.5, leds);
+  // int balls, int length, int fadeRate, bool bMirrored, double SpeedKnob, int StartHeight
+  // FastLedEffects::bounce(leds, 1, 2, 32, 0, 1.0, 1, CRGB::Blue); 
+  FastLedEffects::bounce(leds, 1, 64, true);
+
+  // CRGBPalette16 myPal = heatmap_gp;
 }

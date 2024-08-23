@@ -515,8 +515,20 @@ void FastLedEffects::cometOnce(int inter, int fade, int cometsize,  int delathue
     }
 }
 
-void FastLedEffects::bounce(CRGB leds[]) {
-    
+// Link : https://www.youtube.com/watch?v=ysI30OrkiAc&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=10
+// Bounce bouncer = Bounce(NUM_LEDS, 1);
+Bounce bouncer = Bounce(NUM_LEDS, 1, 64, false);
+void FastLedEffects::bounce( CRGB leds[], int balls, byte fade, bool mirror) {
+    if (bouncer.GetInstantiated() != balls) {
+       bouncer.Recalibrate(balls);
+    }
+    if (bouncer.GetFade() != fade) {
+        bouncer.SetFade(fade);
+    }
+    if (bouncer.GetMirror() != mirror) {
+        bouncer.SetMirror(mirror);
+    }
+    bouncer.Draw(leds);
 }
 
 
@@ -592,3 +604,14 @@ std::vector<uint8_t> FastLedEffects::getArrayRangeValue(uint32_t Color) {
     }
     return arrayOfRanges;
 }
+
+double FastLedEffects::TimeTo() {
+        timeval tv = {0};
+        gettimeofday(&tv, nullptr);
+        return (double)(tv.tv_usec / 1000000.0 + (double)tv.tv_sec);
+}
+
+double FastLedEffects::InitialBallSpeed(double height) {
+    return sqrt(-2 * Gravity * height);
+}
+

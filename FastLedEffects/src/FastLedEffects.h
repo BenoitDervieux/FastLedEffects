@@ -1,5 +1,7 @@
 #include <FastLED.h>
 #include <vector>
+#include <sys/time.h>
+#include "bounce.h"
 class FastLedEffects {
     public:
         /*   1 */ static void fill(int r, int g, int b, CRGB leds[]);
@@ -39,7 +41,7 @@ class FastLedEffects {
         /*  35 */ static void twinkle(int inter, CRGB leds[]);
         /*  36 */ static void comet(int inter, int fade, int cometSize,  int delathue, CRGB leds[]);
         /*  37 */ static void cometOnce(int inter, int fade, int cometsize,  int delathue, double cometspeed, CRGB leds[]);
-        /*  38 */ static void bounce(CRGB leds[]);
+        /*  38 */ static void bounce(CRGB leds[], int balls, byte fade, bool mirror); // Not the best but we keep it for now 
         /*  39 */
         /*  40 */
         /*  41 */
@@ -55,6 +57,9 @@ class FastLedEffects {
         static uint32_t CRGBToInt(const CRGB& color);
         static uint8_t getBeatSinColor(uint32_t Color);
         static std::vector<uint8_t> getArrayRangeValue(uint32_t Color);
+        static double TimeBounce();
+        static double TimeTo();
+        static double InitialBallSpeed(double height);
     
     private:
         int red;
