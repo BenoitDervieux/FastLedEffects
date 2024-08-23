@@ -36,6 +36,8 @@ class FastLedEffects {
         /*  29 */ static void runFire(CRGBPalette16 palette, CRGB leds[]);
         /*  30 */ static void secondNoise(CRGBPalette16 palette, CRGB leds[]);
         /*  31 */ static void fillNoise16(CRGB leds[]);
+
+        // From here is the Dave's Garage implementations
         /*  32 */ static void rainbowDave(int density, int delta, CRGB leds[]);
         /*  33 */ static void marqueeDave(int inter, int hueChanging, int length, CRGB leds[]);
         /*  34 */ static void twinkleOld(int inter, CRGB leds[]);
@@ -44,13 +46,33 @@ class FastLedEffects {
         /*  37 */ static void cometOnce(int inter, int fade, int cometsize,  int delathue, double cometspeed, CRGB leds[]);
         /*  38 */ static void bounce(CRGB leds[], int balls, byte fade, bool mirror); // Not the best but we keep it for now 
         /*  39 */ static void fire(int size, int cooling, int sparking, int sparks, int sparkHeight, bool breversed, bool bmirrored);
-        /*  40 */
-        /*  41 */
-        /*  42 */
-        /*  43 */
-        /*  44 */
-        /*  45 */
-        /*  46 */    
+
+        // Here opimization to make for the colors and the delay
+        /*  40 */ static void storm(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGB leds[]); // Need to improve the use of delay !!!!
+        /*  41 */ static void stormColored(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGB color, CRGB leds[]); // Need to improve the use of delay !!!!
+        /*  42 */ static void stormPalette(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGBPalette16 palette, CRGB leds[]); // Need to improve the use of delay !!!!
+
+        // Here opimization to make for the colors and the delay
+        /*  43 */ static void lighting(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB leds[]);
+        /*  44 */ static void lightingColored(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB color, CRGB leds[]);
+        /*  45 */ static void lightingPalette(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGBPalette16 palette, CRGB leds[]);
+
+        /*  46 */
+        /*  47 */
+        /*  48 */
+        /*  49 */
+        /*  50 */
+        /*  51 */
+        /*  52 */
+        /*  53 */
+        /*  54 */
+        /*  55 */
+        /*  56 */
+        /*  57 */
+        /*  58 */
+        /*  59 */
+        /*  60 */ 
+        
     
 
 

@@ -53,7 +53,11 @@ void loop() {
 
   // FastLedEffects::DrawMarqueeComparison();
 
-  FastLedEffects::fire(NUM_LEDS, 200, 100, 2, 2, false, false);
+  // FastLedEffects::fire(NUM_LEDS, 200, 100, 2, 2, false, false);
+  // FastLedEffects::stormColored(20, 15, 40, 70, CRGB::Red, leds);
+
+  // FastLedEffects::stormPalette(20, 15, 40, 70, myPal, leds);
+  FastLedEffects::lightingPalette(0, 0, 15, 2, 100, myPal, leds);
 
   // CRGBPalette16 myPal = heatmap_gp;
 }

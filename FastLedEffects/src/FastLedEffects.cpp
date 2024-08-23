@@ -560,6 +560,127 @@ void FastLedEffects::fire(int size, int cooling, int sparking, int sparks, int s
     fireEffect.DrawFire();
 }
 
+// Link : https://github.com/netmindz/arduino/blob/master/Deevstock/CloudsV3/CloudsV3.ino
+void FastLedEffects::storm(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGB leds[]) {
+  // clusters of leds, souce of
+  if (random(0, CHANCE) == 0) {
+    for (int i = 0; i < random(1, NUM_LEDS); i++) {
+      int r = random16(NUM_LEDS);
+      for (int j = 0; j < random(1, CLUSTER); j++) {
+        if ((r + j) <  NUM_LEDS) {
+          leds[(r + j)] = CHSV(random(0, 255), 100, 255);
+        }
+      }
+    }
+  }
+  FastLED.delay(SPEED);
+  fadeToBlackBy(leds, NUM_LEDS, FADE);
+}
+
+void FastLedEffects::stormColored(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGB color, CRGB leds[]) {
+    uint32_t convertedColor = FastLedEffects::CRGBToInt(color);
+    uint8_t colBeat = FastLedEffects::getBeatSinColor(convertedColor);
+    // clusters of leds, souce of
+  if (random(0, CHANCE) == 0) {
+    for (int i = 0; i < random(1, NUM_LEDS); i++) {
+      int r = random16(NUM_LEDS);
+      for (int j = 0; j < random(1, CLUSTER); j++) {
+        if ((r + j) <  NUM_LEDS) {
+          leds[(r + j)] = CHSV(colBeat, 100, 255);
+        }
+      }
+    }
+  }
+  FastLED.delay(SPEED);
+  fadeToBlackBy(leds, NUM_LEDS, FADE);
+}
+
+void FastLedEffects::stormPalette(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGBPalette16 palette, CRGB leds[]) {
+    if (random(0, CHANCE) == 0) {
+    for (int i = 0; i < random(1, NUM_LEDS); i++) {
+      int r = random16(NUM_LEDS);
+      for (int j = 0; j < random(1, CLUSTER); j++) {
+        if ((r + j) <  NUM_LEDS) {
+          leds[(r + j)] = ColorFromPalette(palette, random8(), 255, LINEARBLEND);
+        }
+      }
+    }
+  }
+  FastLED.delay(SPEED);
+  fadeToBlackBy(leds, NUM_LEDS, FADE);
+}
+
+// Link : https://github.com/netmindz/arduino/blob/master/Deevstock/CloudsV3/CloudsV3.ino
+void FastLedEffects::lighting(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB leds[]) {
+        ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
+        ledlen = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
+
+        EVERY_N_MILLISECONDS(1000 / frequency) {
+            for (int flashCounter = 0; flashCounter < random8(3, flashes); flashCounter++) {
+                if (flashCounter == 0) dimmer = 5;                        // the brightness of the leader is scaled down by a factor of 5
+                else dimmer = random8(1, 3);                              // return strokes are brighter than the leader
+
+                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 255 / dimmer));
+                FastLED.show();                                           // Show a section of LED's
+                delay(random8(4, 10));                                    // each flash only lasts 4-10 milliseconds
+                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 0));     // Clear the section of LED's
+                FastLED.show();
+
+                if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
+
+                delay(50 + random8(100));                                 // shorter delay between strokes
+            }
+        }
+}
+
+void FastLedEffects::lightingColored(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB color, CRGB leds[]) {
+
+        uint32_t convertedColor = FastLedEffects::CRGBToInt(color);
+        uint8_t colBeat = FastLedEffects::getBeatSinColor(convertedColor);
+
+        ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
+        ledlen = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
+
+        EVERY_N_MILLISECONDS(1000 / frequency) {
+            for (int flashCounter = 0; flashCounter < random8(3, flashes); flashCounter++) {
+                if (flashCounter == 0) dimmer = 5;                        // the brightness of the leader is scaled down by a factor of 5
+                else dimmer = random8(1, 3);                              // return strokes are brighter than the leader
+
+                fill_solid(leds + ledstart, ledlen, CHSV(colBeat, 255, 255 / dimmer));
+                FastLED.show();                                           // Show a section of LED's
+                delay(random8(4, 10));                                    // each flash only lasts 4-10 milliseconds
+                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 0));     // Clear the section of LED's
+                FastLED.show();
+
+                if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
+
+                delay(50 + random8(100));                                 // shorter delay between strokes
+            }
+        }
+}
+
+void FastLedEffects::lightingPalette(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGBPalette16 palette, CRGB leds[]) {
+        ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
+        ledlen = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
+
+        EVERY_N_MILLISECONDS(1000 / frequency) {
+            for (int flashCounter = 0; flashCounter < random8(3, flashes); flashCounter++) {
+                if (flashCounter == 0) dimmer = 5;                        // the brightness of the leader is scaled down by a factor of 5
+                else dimmer = random8(1, 3);                              // return strokes are brighter than the leader
+
+                fill_solid(leds + ledstart, ledlen, ColorFromPalette(palette, random8(), 255, LINEARBLEND));
+                FastLED.show();                                           // Show a section of LED's
+                delay(random8(4, 10));                                    // each flash only lasts 4-10 milliseconds
+                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 0));     // Clear the section of LED's
+                FastLED.show();
+
+                if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
+
+                delay(50 + random8(100));                                 // shorter delay between strokes
+            }
+        }
+}
+
 
 //+---------------------------------------------------------------------------------
 // 
