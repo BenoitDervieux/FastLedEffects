@@ -272,8 +272,8 @@ void FastLedEffects::movingFunkyPalette(CRGBPalette16 palette, int bpm1, int bpm
     FastLED.show();
 }
 
-void FastLedEffects::rainbowWave(int milliseconds, int fade, CRGB leds[]) {
-    uint8_t pos = map(beat8(40, 0), 0, 255, 0, NUM_LEDS - 1);
+void FastLedEffects::rainbowWave(int beat, int milliseconds, int fade, CRGB leds[]) {
+    uint8_t pos = map(beat8(beat, 0), 0, 255, 0, NUM_LEDS - 1);
     leds[pos] = CHSV(hue, 200, 255);
     fadeToBlackBy(leds, NUM_LEDS, fade);
     EVERY_N_MILLISECONDS(milliseconds) {
@@ -506,7 +506,7 @@ void FastLedEffects::cometOnce(int inter, int fade, int cometsize,  int delathue
         }
 
         // Fade the LEDS one step
-        for (int j = 0; j < NUM_LEDS; j++) {
+        for (int j = 0; j < NUM_LEDS; j++) { 
             if (random(2) == 1)
                 // leds[j] =leds[j].fadeToBlackBy(fadeAmt);
                 leds[j].fadeToBlackBy(fadeAmt);
@@ -529,6 +529,35 @@ void FastLedEffects::bounce( CRGB leds[], int balls, byte fade, bool mirror) {
         bouncer.SetMirror(mirror);
     }
     bouncer.Draw(leds);
+}
+
+// Link : https://www.youtube.com/watch?v=MauVVTJb2tk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=6
+// Here we can develop but I am a bit tired of his tutorials tbh
+// There is as well the fact that it takes the whole strip and doesn't behave necessarily like a fire on a 10 leds stripe
+FireEffect fireEffect(NUM_LEDS, 80, 100, 2, 2, false, false);
+void FastLedEffects::fire(int size, int cooling, int sparking, int sparks, int sparkHeight, bool breversed, bool bmirrored) {
+    if (fireEffect.GetSize() != size) {
+        fireEffect.SetSize(size);
+    }
+    if (fireEffect.GetCooling() != cooling) {
+        fireEffect.SetCooling(cooling);
+    }
+    if (fireEffect.GetSparking() != sparking) {
+        fireEffect.SetSparking(sparking);
+    }
+    if (fireEffect.GetSparks() != sparks) {
+        fireEffect.SetSparks(sparks);
+    }
+    if (fireEffect.GetSparkHeight() != sparkHeight) {
+        fireEffect.SetSparkHeight(sparkHeight);
+    }
+    if (fireEffect.GetReversed() != breversed) {
+        fireEffect.SetReversed(breversed);
+    }
+    if (fireEffect.GetMirrored() != bmirrored) {
+        fireEffect.SetMirrored(bmirrored);
+    }
+    fireEffect.DrawFire();
 }
 
 
@@ -605,13 +634,97 @@ std::vector<uint8_t> FastLedEffects::getArrayRangeValue(uint32_t Color) {
     return arrayOfRanges;
 }
 
-double FastLedEffects::TimeTo() {
-        timeval tv = {0};
-        gettimeofday(&tv, nullptr);
-        return (double)(tv.tv_usec / 1000000.0 + (double)tv.tv_sec);
+
+// Pixel drawing functions -- Hard time to really use it. To see later if needed for improvment.
+// Here is the link of the video : https://www.youtube.com/watch?v=RF7GekbNmjU&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=8
+// Comment : might be overwhelming for the controller
+
+CRGB ColorFraction(CRGB colorIn, float fraction) {
+  fraction = min(1.0f, fraction);
+  return CRGB(colorIn).fadeToBlackBy(255 * (1.0f - fraction));
 }
 
-double FastLedEffects::InitialBallSpeed(double height) {
-    return sqrt(-2 * Gravity * height);
+
+void FastLedEffects::DrawPixels(float fPos, float count, CRGB color) {
+    // Calculate how much the first pixel will hold
+    float availFirstPixel = 1.0f - (fPos - (long)(fPos));
+    float amtFirstPixel = min(availFirstPixel, count);
+    float remaining = min(count, FastLED.size()-fPos);
+    int iPos = fPos;
+
+    // Blend (add) in the color of the first partial pixel
+
+    if (remaining > 0.0f)
+    {
+        FastLED.leds()[iPos++] += ColorFraction(color, amtFirstPixel);
+        remaining -= amtFirstPixel;
+    }
+
+    // Now draw any full pixels in the middle
+
+    while (remaining > 1.0f)
+    {
+        FastLED.leds()[iPos++] += color;
+        remaining--;
+    }
+    // Draw tail pixel, up to a single full pixel
+    if (remaining > 0.0f)
+    {
+        FastLED.leds()[iPos] += ColorFraction(color, remaining);
+    }
 }
 
+void DrawMarqueeComparison() {
+    FastLED.clear();
+    EVERY_N_MILLISECONDS(20) {
+        static float scroll = 0.0f;
+        scroll += 0.1f;
+        if (scroll > 5.0)
+            scroll -= 5.0;
+
+        for (float i = scroll; i < NUM_LEDS/2 ; i+= 5)
+        {
+            FastLedEffects::DrawPixels(i, 3, CRGB::Green);
+            FastLedEffects::DrawPixels(NUM_LEDS-1-(int)i, 3, CRGB::Red);
+        }    
+    }
+    FastLED.show();
+
+}
+
+// Function to convert CHSV to CRGB
+CRGB FastLedEffects::hsvToRgb(const CHSV& hsv) {
+    uint8_t region, remainder, p, q, t;
+    uint16_t h, s, v;
+
+    if (hsv.saturation == 0) {
+        // Achromatic (grey)
+        return CRGB(hsv.value, hsv.value, hsv.value);
+    }
+
+    h = hsv.hue;
+    s = hsv.saturation;
+    v = hsv.value;
+
+    region = h / 43;
+    remainder = (h - (region * 43)) * 6; 
+
+    p = (v * (255 - s)) >> 8;
+    q = (v * (255 - ((s * remainder) >> 8))) >> 8;
+    t = (v * (255 - ((s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region) {
+        case 0:
+            return CRGB(v, t, p);
+        case 1:
+            return CRGB(q, v, p);
+        case 2:
+            return CRGB(p, v, t);
+        case 3:
+            return CRGB(p, q, v);
+        case 4:
+            return CRGB(t, p, v);
+        default:
+            return CRGB(v, p, q);
+    }
+}

@@ -2,6 +2,7 @@
 #include <vector>
 #include <sys/time.h>
 #include "bounce.h"
+#include "fire.h"
 class FastLedEffects {
     public:
         /*   1 */ static void fill(int r, int g, int b, CRGB leds[]);
@@ -27,7 +28,7 @@ class FastLedEffects {
         /*  21 */ static void funkyRainbowSinBeat8Two(int fade, CRGB leds[]);
         /*  22 */ static void funkyRangeSinBeat8Two(int fade, CRGB color, CRGB leds[]);
         /*  23 */ static void movingFunkyPalette(CRGBPalette16 palette, int bpm1, int bpm2, CRGB leds[]);
-        /*  24 */ static void rainbowWave(int milliseconds, int fade, CRGB leds[]);
+        /*  24 */ static void rainbowWave(int beat, int milliseconds, int fade, CRGB leds[]);
         /*  25 */ static void choosenWave(int milliseconds, int fade, CRGB color, CRGB leds[]);
         /*  26 */ static void firstNoiseRainbow(int bpm, CRGB leds[]);
         /*  27 */ static void firstNoiseColor(CRGB color, int bpm, CRGB leds[]);
@@ -42,24 +43,22 @@ class FastLedEffects {
         /*  36 */ static void comet(int inter, int fade, int cometSize,  int delathue, CRGB leds[]);
         /*  37 */ static void cometOnce(int inter, int fade, int cometsize,  int delathue, double cometspeed, CRGB leds[]);
         /*  38 */ static void bounce(CRGB leds[], int balls, byte fade, bool mirror); // Not the best but we keep it for now 
-        /*  39 */
+        /*  39 */ static void fire(int size, int cooling, int sparking, int sparks, int sparkHeight, bool breversed, bool bmirrored);
         /*  40 */
         /*  41 */
         /*  42 */
         /*  43 */
         /*  44 */
         /*  45 */
-        /*  46 */
-        
+        /*  46 */    
     
 
 
         static uint32_t CRGBToInt(const CRGB& color);
         static uint8_t getBeatSinColor(uint32_t Color);
         static std::vector<uint8_t> getArrayRangeValue(uint32_t Color);
-        static double TimeBounce();
-        static double TimeTo();
-        static double InitialBallSpeed(double height);
+        static CRGB hsvToRgb(const CHSV& hsv);
+        static void DrawPixels(float fPos, float count, CRGB color);
     
     private:
         int red;

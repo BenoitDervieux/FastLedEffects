@@ -29,7 +29,7 @@ void loop() {
   // FastLedEffects::backAndForthNoSmoothLengthedDot(255, 141, 0, leds, 100, 3);
   // FastLedEffects::rainbowStatic(leds);
   // FastLedEffects::hueFading(30, leds);
-  // CRGBPalette16 myPal = purplePalette;
+  CRGBPalette16 myPal = purplePalette;
   // FastLedEffects::hueWhiteWave(141, 50, leds);
   // FastLedEffects::movingPaletteLinear(myPal, 10, leds);
   // FastLedEffects::spotlightingPalette(myPal, 500, 1, leds);
@@ -39,7 +39,7 @@ void loop() {
   // FastLedEffects::funkyRainbowSinBeat8(10, leds);
   // FastLedEffects::funkyRangeSinBeat8Two(10, CRGB::Red, leds);
   // FastLedEffects::movingFunkyPalette(myPal,45,30, leds);
-  // FastLedEffects::rainbowWave(5, 3, leds);
+  // FastLedEffects::rainbowWave(60, 5, 3, leds);
   // FastLedEffects::choosenWave(5, 3, CRGB::Blue, leds);
   // FastLedEffects::firstNoiseRainbow(30, leds);
   // FastLedEffects::noisePalette(myPal, 100, leds);
@@ -49,7 +49,11 @@ void loop() {
   // FastLedEffects::cometOnce(20, 128, 1, 5, 0.5, leds);
   // int balls, int length, int fadeRate, bool bMirrored, double SpeedKnob, int StartHeight
   // FastLedEffects::bounce(leds, 1, 2, 32, 0, 1.0, 1, CRGB::Blue); 
-  FastLedEffects::bounce(leds, 1, 64, true);
+  // FastLedEffects::bounce(leds, 1, 64, false);
+
+  // FastLedEffects::DrawMarqueeComparison();
+
+  FastLedEffects::fire(NUM_LEDS, 200, 100, 2, 2, false, false);
 
   // CRGBPalette16 myPal = heatmap_gp;
 }
