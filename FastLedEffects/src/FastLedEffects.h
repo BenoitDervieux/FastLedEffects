@@ -57,6 +57,9 @@ class FastLedEffects {
         /*  44 */ static void lightingColored(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB color, CRGB leds[]);
         /*  45 */ static void lightingPalette(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGBPalette16 palette, CRGB leds[]);
 
+        // Links to find new effects
+        // This one : https://www.reddit.com/r/FastLED/comments/pytqrm/party_lighting_for_the_garage_club_delta/
+
         /*  46 */
         /*  47 */
         /*  48 */
