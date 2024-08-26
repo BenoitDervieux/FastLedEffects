@@ -60,12 +60,12 @@ class FastLedEffects {
         // Links to find new effects
         // This one : https://www.reddit.com/r/FastLED/comments/pytqrm/party_lighting_for_the_garage_club_delta/
 
-        /*  46 */
-        /*  47 */
-        /*  48 */
-        /*  49 */
-        /*  50 */
-        /*  51 */
+        /*  46 */ static void beat8_tail(int moveSpeed, int fade, CRGB leds[]);
+        /*  47 */ static void blendIntoRainbow(int waitTime, int colorTime, CRGB leds[]);
+        /*  48 */ static void breatheV2(float pulseSp, CRGB leds[]); // --> Need to add a color option here
+        /*  49 */ static void chaseTargetTalesVarA(int time, CRGB leds[]);
+        /*  50 */ static void chaseTargetTalesVarB(int time, CRGB leds[]);
+        /*  51 */ static void chaseTargetTalesVarC(int time, CRGB leds[]);
         /*  52 */
         /*  53 */
         /*  54 */

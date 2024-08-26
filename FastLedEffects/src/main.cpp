@@ -58,7 +58,10 @@ void loop() {
   // FastLedEffects::stormColored(20, 15, 40, 70, CRGB::Red, leds);
 
   // FastLedEffects::stormPalette(20, 15, 40, 70, myPal, leds);
-  FastLedEffects::lightingPalette(0, 0, 15, 2, 100, myPal, leds);
+  // FastLedEffects::lightingPalette(0, 0, 15, 2, 100, myPal, leds);
+  // FastLedEffects::beat8_tail(2, 32, leds);
+  // FastLedEffects::blendIntoRainbow(150, 2, leds);
+  FastLedEffects::chaseTargetTalesVarB(10, leds); 
 
   // CRGBPalette16 myPal = heatmap_gp;
 }

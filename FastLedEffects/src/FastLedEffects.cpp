@@ -681,6 +681,207 @@ void FastLedEffects::lightingPalette(int ledstart, int ledlen, int flashes, int 
         }
 }
 
+// Link: https://github.com/marmilicious/FastLED_examples/blob/master/beat8.ino
+void FastLedEffects::beat8_tail(int moveSpeed, int fadeRate, CRGB leds[]) {
+    static uint8_t hueBeat = 0;
+    EVERY_N_MILLISECONDS( 50 ) { hueBeat++; }
+
+    EVERY_N_MILLISECONDS( 5 ) {
+    fadeToBlackBy( leds, NUM_LEDS, fadeRate);  // Fade out pixels.
+    }
+    uint16_t pos = beat8(moveSpeed) % NUM_LEDS;  // modulo the position to be within NUM_LEDS
+    leds[pos] = CHSV( hueBeat, 200, 255);
+
+    FastLED.show();
+
+}
+
+static uint8_t pos = 0;  //stores a position for color being blended in
+static uint8_t hue2;  //stores a color to blend into the background
+void FastLedEffects::blendIntoRainbow(int waitTime, int colorTime, CRGB leds[]) {
+
+    EVERY_N_MILLISECONDS(waitTime){
+        hue++;  //used to cycle through the rainbow
+    }
+
+    EVERY_N_MILLISECONDS(waitTime + 30) {
+        pos++;
+        if (pos == NUM_LEDS) { pos = 0; }  //reset to begining
+    }
+
+    EVERY_N_MILLISECONDS(colorTime){
+        hue2 = hue2 - 1;  //used to change the moving color
+    }
+    CRGB blendThisIn  = CHSV(hue2, 170, 255);  //color to blend into the background
+    CRGB blendThisIn2 = CHSV(hue2, 200, 225);  //color to blend into the background
+    CRGB blendThisIn3 = CHSV(hue2, 230, 200);  //color to blend into the background
+    CRGB blendThisIn4 = CHSV(hue2, 255, 180);  //color to blend into the background
+
+    static uint8_t blendAmount = 240;  //amount of blend  [range: 0-255]
+
+    nblend(leds[pos],                  blendThisIn4, blendAmount/3);
+    nblend(leds[mod8(pos+1,NUM_LEDS)], blendThisIn3, blendAmount/2);
+    nblend(leds[mod8(pos+2,NUM_LEDS)], blendThisIn2, blendAmount);
+    nblend(leds[mod8(pos+3,NUM_LEDS)], blendThisIn,  blendAmount);
+    nblend(leds[mod8(pos+4,NUM_LEDS)], blendThisIn2, blendAmount);
+    nblend(leds[mod8(pos+5,NUM_LEDS)], blendThisIn3, blendAmount/2);
+    nblend(leds[mod8(pos+6,NUM_LEDS)], blendThisIn4, blendAmount/3);
+
+    FastLED.show();  //update the display
+
+}
+
+static float pulseSpeed = 0.5;  // Larger value gives faster pulse.
+uint8_t hueA = 15;  // Start hue at valueMin.
+uint8_t satA = 230;  // Start saturation at valueMin.
+float valueMin = 120.0;  // Pulse minimum value (Should be less then valueMax).
+uint8_t hueB = 95;  // End hue at valueMax.
+uint8_t satB = 255;  // End saturation at valueMax.
+float valueMax = 255.0;  // Pulse maximum value (Should be larger then valueMin).
+// uint8_t hue = hueA;  // Do Not Edit
+uint8_t sat = satA;  // Do Not Edit
+float val = valueMin;  // Do Not Edit
+uint8_t hueDelta = hueA - hueB;  // Do Not Edit
+static float delta = (valueMax - valueMin) / 2.35040238;  // Do Not Edit
+
+void FastLedEffects::breatheV2(float pulseSp, CRGB leds[]) {
+    pulseSpeed = pulseSp;
+    float dV = ((exp(sin(pulseSpeed * millis()/2000.0*PI)) -0.36787944) * delta);
+    val = valueMin + dV;
+    hue = map(val, valueMin, valueMax, hueA, hueB);  // Map hue based on current val
+    sat = map(val, valueMin, valueMax, satA, satB);  // Map sat based on current val
+
+    for (int i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CHSV(hue, sat, val);
+
+        // You can experiment with commenting out these dim8_video lines
+        // to get a different sort of look.
+        leds[i].r = dim8_video(leds[i].r);
+        leds[i].g = dim8_video(leds[i].g);
+        leds[i].b = dim8_video(leds[i].b);
+    }
+
+    FastLED.show();
+}
+
+static int target[NUM_LEDS];  // Place to save some target values.
+static int countOff;
+static int delta2;
+static int temp;
+static int lowCutoff = 50;
+void FastLedEffects::chaseTargetTalesVarA(int time, CRGB leds[]) {
+    EVERY_N_MILLISECONDS(time) {
+        // Assign random target values whenever count is zero.
+        if (countOff == 0){
+            for (int i=0; i < NUM_LEDS; i++){
+            target[random8(NUM_LEDS)] = random8();  // Pick random pixels, assign random values.
+            if (target[i] < lowCutoff){
+                target[i] = 0;  // Force low values to clamp to zero.
+            }
+            }
+            countOff = random8(35,70);  // Pick a new count value.
+        }
+        for (int i=0; i < NUM_LEDS; i++){
+            
+            // Check current values against target values.
+            if (leds[i].r < target[i]){  // less then the target, so fade up.
+            delta2 = (target[i] - leds[i].r) / 5;
+            if (leds[i].r + delta2 >= target[i]){
+                leds[i].r = target[i];  // limit to target.
+            }
+            else { leds[i].r += delta2; }
+            }
+            else {  // greater then the target, so fade down.
+            delta2 = ((leds[i].r - target[i])/8) + 1;  // +1 so delta is always at least 1.
+            if (leds[i].r - delta <= target[i]){
+                leds[i].r = target[i];  // limit to target.
+            }
+            else { leds[i].r -= delta2; }
+            }
+            if (i == 0){ temp = delta2; }  // Save first pixel's delta number to print below.
+            // Continously fade target to zero.
+            if (target[i] > lowCutoff){
+            target[i] -= 2;  // Fade by this ammount.
+            }
+            else { target[i] = 0; }  // If target is less then lowCutoff, clamp to zero.
+        }//end of looping over pixels.
+        FastLED.show();  // Display the leds[] array.
+        countOff--;  // reduce count by one.
+    }
+}
+
+CHSV leds_vu[NUM_LEDS];  // FastLED array using HSV.
+int highCutoff = 200;
+// int lowCutoff = 30;
+static int hue_high = 0;  // red for high values with,
+static int hue_low = 96;  // green for low values.
+void FastLedEffects::chaseTargetTalesVarB(int time, CRGB leds[]) {
+    lowCutoff = 30;
+    EVERY_N_MILLISECONDS(time) {
+                // Assign random target values whenever count is zero.
+        if (countOff == 0){
+            for (int i=0; i < NUM_LEDS; i++){
+            target[random8(NUM_LEDS)] = random8();  // Pick random pixels, assign random values.
+            if (target[i] < lowCutoff){
+                target[i] = 0;  // Force low values to clamp to zero.
+            }
+            }
+            countOff = random8(35,70);  // Pick a new count value.
+            Serial.println("*New targets assigned!*");
+        }
+
+
+        for (int i=0; i < NUM_LEDS; i++){
+            // Check current values against target values.
+            if (leds_vu[i].value < target[i]){  // less then the target, so fade up.
+            delta = (leds_vu[i].value - target[i]) / 5;
+            if (leds_vu[i].value + delta >= target[i]){
+                leds_vu[i].value = target[i];  // limit to target.
+            }
+            else {
+                leds_vu[i].value += delta;
+            }
+            }
+
+            else {  // greater then the target, so fade down.
+            delta = ((leds_vu[i].value - target[i])/8) + 1;  // +1 so delta is always at least 1.
+            if (leds_vu[i].value - delta <= target[i]){
+                leds_vu[i].value = target[i];  // limit to target.
+            }
+            else {
+                leds_vu[i].value -= delta;
+            }
+            }
+            if (i == 0){ temp = delta; }  // Save first pixel's delta number to print below.
+
+            // Tweak hue color based on brightness.
+            int c_hue = constrain(leds_vu[i].value,lowCutoff,highCutoff);
+            leds_vu[i].hue = map(c_hue, lowCutoff, highCutoff, hue_low, hue_high);
+                        // map(valueIn, fromLow,   fromHigh,   toLow,   toHigh)
+
+            leds_vu[i].saturation = 255;  // Set saturation to full.
+
+            // Copy the HSV leds_vu[] data to the leds[] array.
+            leds[i] = leds_vu[i];
+            // FastLED will automatically convert HSV to RGB data.  Converting from HSV
+            // to RGB is very fast and also accurate.  It is possible to convert from
+            // RGB to HSV, but it is not automatic, not totally acurate, and not as fast.
+
+            // Continously fade target to zero.
+            if (target[i] > lowCutoff){
+            target[i] -= 2;  // Fade by this ammount.
+            }
+            else {
+            target[i] = 0;  // If target less then lowCutoff, clamp to zero.
+            }
+
+        }//end of looping over pixels.
+        
+        FastLED.show();  // Display the leds[] array.
+        countOff--;  // reduce count by one.
+    }
+}
+
 
 //+---------------------------------------------------------------------------------
 // 
