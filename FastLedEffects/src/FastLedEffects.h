@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include "bounce.h"
 #include "fire.h"
+
 class FastLedEffects {
     public:
         /*   1 */ static void fill(int r, int g, int b, CRGB leds[]);
@@ -65,16 +66,26 @@ class FastLedEffects {
         /*  48 */ static void breatheV2(float pulseSp, CRGB leds[]); // --> Need to add a color option here
         /*  49 */ static void chaseTargetTalesVarA(int time, CRGB leds[]);
         /*  50 */ static void chaseTargetTalesVarB(int time, CRGB leds[]);
-        /*  51 */ static void chaseTargetTalesVarC(int time, CRGB leds[]);
-        /*  52 */
-        /*  53 */
-        /*  54 */
-        /*  55 */
-        /*  56 */
-        /*  57 */
-        /*  58 */
-        /*  59 */
-        /*  60 */ 
+        /*  51 */ static void chaseTargetTalesVarC(int boilingTime, int smoothFading, int fade, CRGB leds[]);
+        /*  52 */ static void everyNTimerVariables(uint16_t timerA, uint16_t timerB, CRGB leds[]);
+        /*  53 */ static void fillUpStrip(CRGB leds[]);
+        /*  54 */ static void heartBeat2(uint16_t beat_speed, uint8_t dub_offset, CRGB leds[]);
+        /*  55 */ static void heartBeat3(bool rainbow, CRGB leds[]); // --> Need to add color option
+        /*  56 */ static void heartPulseBloodFlowing(CRGB leds[]); // --> Need to add color option
+        /*  57 */ static void lighthouseBeaconV2(int width, uint16_t time, uint8_t fadeRate, CRGB leds[]); // --> Need to add color option
+        /*  58 */ static void matchingGlitter1(CRGB leds[]); // Check for custom colors
+        /*  59 */ static void matchingGlitter2(CRGB leds[]); // Check for custom colors
+        /*  60 */ static void matchingGlitter3(bool second, bool thrid, CRGB leds[]); // Check for custom colors
+        /*  61 */ static void matchingGlitter4(bool more, CRGB leds[]); // Check for custom colors
+        /*  62 */ static void mirrorFadeEnds(int fadeOver, CRGB leds[]);
+        /*  63 */ static void Fire2012(int time,int cooling, int sparking, CRGB leds[]);
+        /*  64 */ static void Fire2012_halfStrip(int time, int cooling, int sparking, bool gReverseDirection, CRGB leds[]);
+        /*  65 */ static void movingColoredBar(CRGBPalette16 palette, CRGB leds[], int colorBarLength = 5, int frameDelay = 80);
+        /*  66 */ static void repeatingPattern(int time1, int time2, int fade, CRGB leds[]);
+        /*  67 */ static void savedPixel(int time, CRGB leds[]);
+        /*  68 */ static void sinCosLinear(CRGB leds[]); // --> Need to add color option
+        /*  69 */ static void sparkles(CRGB leds[], int sparkel_duration = random(80, 200), int sparkel_amount = 100, int sparkel_spread = 30);
+        /*  70 */
         
     
 
@@ -84,6 +95,9 @@ class FastLedEffects {
         static std::vector<uint8_t> getArrayRangeValue(uint32_t Color);
         static CRGB hsvToRgb(const CHSV& hsv);
         static void DrawPixels(float fPos, float count, CRGB color);
+        static int sumPulse(int time_shift);
+        static uint8_t pulseWave8(uint32_t ms, uint16_t cycleLength, uint16_t pulseLength);
+        static void drawFractionalBar( int pos16, int width, uint8_t hue, uint8_t fadeRate, CRGB leds[]);
     
     private:
         int red;

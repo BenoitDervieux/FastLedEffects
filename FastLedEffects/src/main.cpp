@@ -13,6 +13,7 @@
 
 #define NUM_LEDS 10
 #define DATA_PIN_1 23
+#define BRIGHTNESS 100
 
 CRGB leds[NUM_LEDS];
 
@@ -20,7 +21,7 @@ void setup() {
 
   FastLED.addLeds<WS2812B, DATA_PIN_1, GRB>(leds, NUM_LEDS);
   // FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
-  FastLED.setBrightness(100);
+  FastLED.setBrightness(BRIGHTNESS);
   FastLED.show();
   
 }
@@ -30,7 +31,7 @@ void loop() {
   // FastLedEffects::backAndForthNoSmoothLengthedDot(255, 141, 0, leds, 100, 3);
   // FastLedEffects::rainbowStatic(leds);
   // FastLedEffects::hueFading(30, leds);
-  CRGBPalette16 myPal = purplePalette;
+  CRGBPalette16 myPal = lavaPalette;
   // FastLedEffects::hueWhiteWave(141, 50, leds);
   // FastLedEffects::movingPaletteLinear(myPal, 10, leds);
   // FastLedEffects::spotlightingPalette(myPal, 500, 1, leds);
@@ -61,7 +62,20 @@ void loop() {
   // FastLedEffects::lightingPalette(0, 0, 15, 2, 100, myPal, leds);
   // FastLedEffects::beat8_tail(2, 32, leds);
   // FastLedEffects::blendIntoRainbow(150, 2, leds);
-  FastLedEffects::chaseTargetTalesVarB(10, leds); 
+  // FastLedEffects::chaseTargetTalesVarC(2000, 50, 70, leds);
+
+  // FastLedEffects::everyNTimerVariables(1000, 500, leds); 
+  // FastLedEffects::fillUpStrip(leds);
+  // FastLedEffects::heartBeat3(true, leds);
+  // FastLedEffects::heartPulseBloodFlowing(leds);
+  // FastLedEffects::lighthouseBeaconV2(4, 10, 0, leds);
+  // FastLedEffects::matchingGlitter4(true, leds);
+  // FastLedEffects::Fire2012_halfStrip(30, 90, 50, true, leds);
+  // FastLedEffects::movingColoredBar(myPal, leds, 3, 40);
+  // FastLedEffects::repeatingPattern(50, 200, 32, leds);
+  // FastLedEffects::savedPixel(100, leds);
+  // FastLedEffects::sinCosLinear(leds);
+  FastLedEffects::sparkles(leds);
 
   // CRGBPalette16 myPal = heatmap_gp;
 }
