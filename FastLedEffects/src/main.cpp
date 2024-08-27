@@ -75,7 +75,8 @@ void loop() {
   // FastLedEffects::repeatingPattern(50, 200, 32, leds);
   // FastLedEffects::savedPixel(100, leds);
   // FastLedEffects::sinCosLinear(leds);
-  FastLedEffects::sparkles(leds);
+  // FastLedEffects::sparkles(leds);
+  FastLedEffects::firstNoiseRainbow(30, leds);
 
   // CRGBPalette16 myPal = heatmap_gp;
 }

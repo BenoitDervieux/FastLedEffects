@@ -27,6 +27,114 @@ static uint16_t t = 0;
 static uint16_t brightnessScale = 150;
 static uint16_t indexScale = 20;
 
+// Second Noise
+static uint8_t octaveVal = 2;
+static uint16_t xVal = 0;
+static int scaleVal = 50;
+static uint16_t timeVal = 0;
+static uint8_t noiseData[NUM_LEDS];
+
+// Fill Noise 16
+static uint8_t hue_octaves = 1;
+static uint16_t hue_x = 1;
+static int hue_scale = 50;
+
+// RainbowDave
+static uint8_t initialHue = 0;
+
+//Marquee Dave
+static unsigned long lastUpdate = 0;  // Store the last update time
+unsigned long interval = 0;   // Interval in milliseconds between updates
+
+// BlendIntoRainbow
+static uint8_t pos = 0;  //stores a position for color being blended in
+static uint8_t hue2;  //stores a color to blend into the background
+
+// Breathe V2
+static float pulseSpeed = 0.5;  // Larger value gives faster pulse.
+uint8_t hueA = 15;  // Start hue at valueMin.
+uint8_t satA = 230;  // Start saturation at valueMin.
+float valueMin = 120.0;  // Pulse minimum value (Should be less then valueMax).
+uint8_t hueB = 95;  // End hue at valueMax.
+uint8_t satB = 255;  // End saturation at valueMax.
+float valueMax = 255.0;  // Pulse maximum value (Should be larger then valueMin).
+// uint8_t hue = hueA;  // Do Not Edit
+uint8_t sat = satA;  // Do Not Edit
+float val = valueMin;  // Do Not Edit
+uint8_t hueDelta = hueA - hueB;  // Do Not Edit
+static float delta = (valueMax - valueMin) / 2.35040238;  // Do Not Edit
+
+// Chase Target Tales Var A
+static int target[NUM_LEDS];  // Place to save some target values.
+static int countOff;
+static int delta2;
+static int temp;
+static int lowCutoff = 50;
+
+// Chase Target Var B
+CHSV leds_vu[NUM_LEDS];  // FastLED array using HSV.
+int highCutoff = 200;
+// int lowCutoff = 30;
+static int hue_high = 0;  // red for high values with,
+static int hue_low = 96;  // green for low values.
+
+// Chase target tales Var C
+static uint8_t pixel;  // Which pixel to operate on.
+static uint8_t ccc = 0;  // color combination choice (ccc)
+
+// everyNTimerVariables
+static boolean counterTriggered = 0;  // Event triggered? [1=true, 0=false]
+
+// FillUpStrip
+static uint8_t fill_delay = 20;        // Increase to slow fill rate.
+static float delay_base = 1.17;        // Used to add a delay as strip fills up.
+static float delay_multiplier = 2.15;  // Used to add a delay as strip fills up.
+
+// Heart Beat 2
+CRGB lubs_color = CHSV(15,230,255);
+CRGB dubs_color = CHSV(0,255,90);
+
+// Heart Beat 3
+#define LUB_TIME   785  // Time between main lubs [milliseconds]
+#define DUB_DELAY  120  // Short delay for when secondary dub starts [milliseconds]
+uint8_t beatHue = 0;  // Hue of heart beat (0 is red)
+
+// Heart Pulse Blood Flowing
+static uint8_t bloodHue = 96;  // Blood color [hue from 0-255]
+static uint8_t bloodSat = 255;  // Blood staturation [0-255]
+static int flowDirection = -1;   // Use either 1 or -1 to set flow direction
+static uint16_t cycleLength = 1500;  // Lover values = continuous flow, higher values = distinct pulses.
+static uint16_t pulseLength = 150;  // How long the pulse takes to fade out.  Higher value is longer.
+static uint16_t pulseOffset = 200;  // Delay before second pulse.  Higher value is more delay.
+static uint8_t baseBrightness = 10;  // Brightness of LEDs when not pulsing. Set to 0 for off.
+
+// Light House Beacon V2
+int deltaInt = 1; // Number of 16ths of a pixel to move.  (Use negative value for reverse.)
+int pixelPos = 0; // position of the "fraction-based bar" [don't edit]
+
+// Moving Colored Bar
+static int barPosition = 1;
+static int paletteIndexmcb = 0;
+
+// Repeating pattern
+// How often does the pattern repeat?
+static uint16_t repeatEvery = 5;
+// Therefore the number of times the pattern will repeat down the strip is:
+static uint16_t numberOfRepeats = NUM_LEDS/repeatEvery;
+
+// Saved Pixel
+CRGB pData[NUM_LEDS];  // extra array to store some info about the pixels
+
+// SinCosLinear
+uint8_t potValue;  // Simulated potentiometer value.
+uint8_t sin_output;
+uint8_t cos_output;
+uint16_t slowBy = 15;  // miliseconds to delay
+
+// Objects here
+// Bounce bouncer = Bounce(NUM_LEDS, 1);
+Bounce bouncer = Bounce(NUM_LEDS, 1, 64, false);
+FireEffect fireEffect(NUM_LEDS, 80, 100, 2, 2, false, false);
 
 
 // Add link to fastLed : 
@@ -339,13 +447,6 @@ void FastLedEffects::runFire(CRGBPalette16 palette, CRGB leds[]) {
     FastLED.show();
 }
 
-// Second Noise
-static uint8_t octaveVal = 2;
-static uint16_t xVal = 0;
-static int scaleVal = 50;
-static uint16_t timeVal = 0;
-static uint8_t noiseData[NUM_LEDS];
-
 void FastLedEffects::secondNoise(CRGBPalette16 palette, CRGB leds[]) {
 
     timeVal = millis() / 4;
@@ -357,11 +458,6 @@ void FastLedEffects::secondNoise(CRGBPalette16 palette, CRGB leds[]) {
     FastLED.show();
 }
 
-// Fill Noise 16
-static uint8_t hue_octaves = 1;
-static uint16_t hue_x = 1;
-static int hue_scale = 50;
-
 void FastLedEffects::fillNoise16(CRGB leds[]) {
     octaveVal = 1;
     xVal = 0;
@@ -371,7 +467,6 @@ void FastLedEffects::fillNoise16(CRGB leds[]) {
     fill_noise16(leds, NUM_LEDS, octaveVal, xVal, scaleVal, hue_octaves, hue_x, hue_scale, ntime, hue_shift);
     FastLED.show();
 }
-static uint8_t initialHue = 0;
 
 // Link : https://www.youtube.com/watch?v=r6vMdnqUjTk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=12
 void FastLedEffects::rainbowDave(int density, int delta, CRGB leds[]) {
@@ -379,8 +474,7 @@ void FastLedEffects::rainbowDave(int density, int delta, CRGB leds[]) {
     fill_rainbow(leds, NUM_LEDS, initialHue += density, delta);
     FastLED.show();
 }
-static unsigned long lastUpdate = 0;  // Store the last update time
-unsigned long interval = 0;   // Interval in milliseconds between updates
+
 // Link : https://www.youtube.com/watch?v=r6vMdnqUjTk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=12
 void FastLedEffects::marqueeDave(int inter, int hueChanging, int length, CRGB leds[]) {
     static byte j = HUE_BLUE;
@@ -516,8 +610,6 @@ void FastLedEffects::cometOnce(int inter, int fade, int cometsize,  int delathue
 }
 
 // Link : https://www.youtube.com/watch?v=ysI30OrkiAc&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=10
-// Bounce bouncer = Bounce(NUM_LEDS, 1);
-Bounce bouncer = Bounce(NUM_LEDS, 1, 64, false);
 void FastLedEffects::bounce( CRGB leds[], int balls, byte fade, bool mirror) {
     if (bouncer.GetInstantiated() != balls) {
        bouncer.Recalibrate(balls);
@@ -534,7 +626,7 @@ void FastLedEffects::bounce( CRGB leds[], int balls, byte fade, bool mirror) {
 // Link : https://www.youtube.com/watch?v=MauVVTJb2tk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=6
 // Here we can develop but I am a bit tired of his tutorials tbh
 // There is as well the fact that it takes the whole strip and doesn't behave necessarily like a fire on a 10 leds stripe
-FireEffect fireEffect(NUM_LEDS, 80, 100, 2, 2, false, false);
+
 void FastLedEffects::fire(int size, int cooling, int sparking, int sparks, int sparkHeight, bool breversed, bool bmirrored) {
     if (fireEffect.GetSize() != size) {
         fireEffect.SetSize(size);
@@ -696,8 +788,7 @@ void FastLedEffects::beat8_tail(int moveSpeed, int fadeRate, CRGB leds[]) {
 
 }
 
-static uint8_t pos = 0;  //stores a position for color being blended in
-static uint8_t hue2;  //stores a color to blend into the background
+
 void FastLedEffects::blendIntoRainbow(int waitTime, int colorTime, CRGB leds[]) {
 
     EVERY_N_MILLISECONDS(waitTime){
@@ -731,19 +822,6 @@ void FastLedEffects::blendIntoRainbow(int waitTime, int colorTime, CRGB leds[]) 
 
 }
 
-static float pulseSpeed = 0.5;  // Larger value gives faster pulse.
-uint8_t hueA = 15;  // Start hue at valueMin.
-uint8_t satA = 230;  // Start saturation at valueMin.
-float valueMin = 120.0;  // Pulse minimum value (Should be less then valueMax).
-uint8_t hueB = 95;  // End hue at valueMax.
-uint8_t satB = 255;  // End saturation at valueMax.
-float valueMax = 255.0;  // Pulse maximum value (Should be larger then valueMin).
-// uint8_t hue = hueA;  // Do Not Edit
-uint8_t sat = satA;  // Do Not Edit
-float val = valueMin;  // Do Not Edit
-uint8_t hueDelta = hueA - hueB;  // Do Not Edit
-static float delta = (valueMax - valueMin) / 2.35040238;  // Do Not Edit
-
 void FastLedEffects::breatheV2(float pulseSp, CRGB leds[]) {
     pulseSpeed = pulseSp;
     float dV = ((exp(sin(pulseSpeed * millis()/2000.0*PI)) -0.36787944) * delta);
@@ -764,11 +842,7 @@ void FastLedEffects::breatheV2(float pulseSp, CRGB leds[]) {
     FastLED.show();
 }
 
-static int target[NUM_LEDS];  // Place to save some target values.
-static int countOff;
-static int delta2;
-static int temp;
-static int lowCutoff = 50;
+
 void FastLedEffects::chaseTargetTalesVarA(int time, CRGB leds[]) {
     EVERY_N_MILLISECONDS(time) {
         // Assign random target values whenever count is zero.
@@ -810,11 +884,7 @@ void FastLedEffects::chaseTargetTalesVarA(int time, CRGB leds[]) {
     }
 }
 
-CHSV leds_vu[NUM_LEDS];  // FastLED array using HSV.
-int highCutoff = 200;
-// int lowCutoff = 30;
-static int hue_high = 0;  // red for high values with,
-static int hue_low = 96;  // green for low values.
+
 void FastLedEffects::chaseTargetTalesVarB(int time, CRGB leds[]) {
     lowCutoff = 30;
     EVERY_N_MILLISECONDS(time) {
@@ -882,8 +952,7 @@ void FastLedEffects::chaseTargetTalesVarB(int time, CRGB leds[]) {
     }
 }
 
-static uint8_t pixel;  // Which pixel to operate on.
-static uint8_t ccc = 0;  // color combination choice (ccc)
+
 void FastLedEffects::chaseTargetTalesVarC(int boilingTime, int smoothFading, int fade, CRGB leds[]) {
     // Normal values : Boiling from 200 to 2000, fade was 70, smoothfading was 50
     hue_high = 0;  // red for high values with,
@@ -983,7 +1052,6 @@ void FastLedEffects::chaseTargetTalesVarC(int boilingTime, int smoothFading, int
 }
 
 
-static boolean counterTriggered = 0;  // Event triggered? [1=true, 0=false]
 void FastLedEffects::everyNTimerVariables(uint16_t timerA, uint16_t timerB, CRGB leds[]) {
     // TimerA roughly 3000 and timerB 500
     // Setting the amount of time for "triggerTimer".
@@ -1023,9 +1091,7 @@ void FastLedEffects::everyNTimerVariables(uint16_t timerA, uint16_t timerB, CRGB
   FastLED.show();
 }
 
-static uint8_t fill_delay = 20;        // Increase to slow fill rate.
-static float delay_base = 1.17;        // Used to add a delay as strip fills up.
-static float delay_multiplier = 2.15;  // Used to add a delay as strip fills up.
+
 void FastLedEffects::fillUpStrip(CRGB leds[]) {
     // Draw the moving pixels.
     for (int i=0; i < (NUM_LEDS - countOff); i++){
@@ -1060,8 +1126,6 @@ void FastLedEffects::fillUpStrip(CRGB leds[]) {
 }
 
 
-CRGB lubs_color = CHSV(15,230,255);
-CRGB dubs_color = CHSV(0,255,90);
 void FastLedEffects::heartBeat2(uint16_t beat_speed, uint8_t dub_offset, CRGB leds[]) {
     // Beat_speed supposed to be 1100
     // Dub_offset supposed to be 180
@@ -1109,10 +1173,6 @@ void FastLedEffects::heartBeat2(uint16_t beat_speed, uint8_t dub_offset, CRGB le
   FastLED.show();
 
 }
-
-#define LUB_TIME   785  // Time between main lubs [milliseconds]
-#define DUB_DELAY  120  // Short delay for when secondary dub starts [milliseconds]
-uint8_t beatHue = 0;  // Hue of heart beat (0 is red)
 
 void FastLedEffects::heartBeat3(bool rainbow, CRGB leds[]) {
 
@@ -1179,13 +1239,6 @@ void FastLedEffects::heartBeat3(bool rainbow, CRGB leds[]) {
     FastLED.show();
 }
 
-static uint8_t bloodHue = 96;  // Blood color [hue from 0-255]
-static uint8_t bloodSat = 255;  // Blood staturation [0-255]
-static int flowDirection = -1;   // Use either 1 or -1 to set flow direction
-static uint16_t cycleLength = 1500;  // Lover values = continuous flow, higher values = distinct pulses.
-static uint16_t pulseLength = 150;  // How long the pulse takes to fade out.  Higher value is longer.
-static uint16_t pulseOffset = 200;  // Delay before second pulse.  Higher value is more delay.
-static uint8_t baseBrightness = 10;  // Brightness of LEDs when not pulsing. Set to 0 for off.
 void FastLedEffects::heartPulseBloodFlowing(CRGB leds[]) {
     for (int i = 0; i < NUM_LEDS ; i++) {
     uint8_t bloodVal = sumPulse( (5/NUM_LEDS/2) + (NUM_LEDS/2) * i * flowDirection );
@@ -1194,10 +1247,6 @@ void FastLedEffects::heartPulseBloodFlowing(CRGB leds[]) {
   FastLED.show();
 }
 
-
-int deltaInt = 1; // Number of 16ths of a pixel to move.  (Use negative value for reverse.)
-
-int pixelPos = 0; // position of the "fraction-based bar" [don't edit]
 void FastLedEffects::lighthouseBeaconV2(int width, uint16_t time, uint8_t fadeRate, CRGB leds[]) {
     sat = 190;
     hue = 42;
@@ -1385,8 +1434,7 @@ void FastLedEffects::Fire2012_halfStrip(int time, int cooling, int sparking, boo
   }
 }
  
-static int barPosition = 1;
-static int paletteIndexmcb = 0;
+
 void FastLedEffects::movingColoredBar(CRGBPalette16 palette, CRGB leds[], int colorBarLength, int frameDelay) {
     // Adjust framde delay if you want it to be more frequent
     int numberofColors = sizeof(palette)/sizeof(long);
@@ -1417,10 +1465,6 @@ void FastLedEffects::movingColoredBar(CRGBPalette16 palette, CRGB leds[], int co
   FastLED.show();
 }
 
-// How often does the pattern repeat?
-static uint16_t repeatEvery = 5;
-// Therefore the number of times the pattern will repeat down the strip is:
-static uint16_t numberOfRepeats = NUM_LEDS/repeatEvery;
 void FastLedEffects::repeatingPattern(int time1, int time2, int fade, CRGB leds[]) {
     // Time1 is 50 usually nd time2 is 1000, fade is 7
 
@@ -1455,7 +1499,6 @@ void FastLedEffects::repeatingPattern(int time1, int time2, int fade, CRGB leds[
 
 }
 
-CRGB pData[NUM_LEDS];  // extra array to store some info about the pixels
 void FastLedEffects::savedPixel(int time, CRGB leds[]) {
     EVERY_N_MILLISECONDS_I(timingObj, time) {
     uint8_t n = random8(1,5);
@@ -1497,10 +1540,6 @@ void FastLedEffects::savedPixel(int time, CRGB leds[]) {
 
 }
 
-uint8_t potValue;  // Simulated potentiometer value.
-uint8_t sin_output;
-uint8_t cos_output;
-uint16_t slowBy = 15;  // miliseconds to delay
 void FastLedEffects::sinCosLinear(CRGB leds[]) {
 
     //====run forward direction====
@@ -1583,8 +1622,6 @@ void FastLedEffects::sparkles(CRGB leds[], int sparkel_duration, int sparkel_amo
 
     FastLED.show();
 }
-
-
 
 
 //+---------------------------------------------------------------------------------
