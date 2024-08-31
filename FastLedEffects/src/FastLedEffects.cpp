@@ -146,9 +146,9 @@ void FastLedEffects::fill(int r, int g, int b, CRGB leds[]) {
 
 // Add link to fastLed : 
 // Add link to video : https://www.youtube.com/watch?v=4Ut4UK7612M&list=PLgXkGn3BBAGi5dTOCuEwrLuFtfz0kGFTC&index=2
-void FastLedEffects::blink(int r, int g, int b, CRGB leds[], int long time) {
+void FastLedEffects::blink(int r, int g, int b, CRGB leds[], int tid) {
     unsigned long currentMillis = millis();
-    if (currentMillis - previousMillisBlink >= time) {
+    if (currentMillis - previousMillisBlink >= tid) {
         previousMillisBlink = currentMillis;
         fill_solid(leds, NUM_LEDS, CRGB(r, g, b));
         FastLED.show();
@@ -178,8 +178,8 @@ void FastLedEffects::fillGradientThreeColors(int r1, int g1, int b1, int r2, int
 }
 
 // Add link to video : https://www.youtube.com/watch?v=4Ut4UK7612M&list=PLgXkGn3BBAGi5dTOCuEwrLuFtfz0kGFTC&index=2
-void FastLedEffects::backAndForthNoSmoothOneDot(int r, int g, int b, CRGB leds[], int long time) {
-    EVERY_N_MILLISECONDS(time) {   // Update every 100 milliseconds
+void FastLedEffects::backAndForthNoSmoothOneDot(int r, int g, int b, CRGB leds[], int tid) {
+    EVERY_N_MILLISECONDS(tid) {   // Update every 100 milliseconds
         // Turn off all LEDs
         fill_solid(leds, NUM_LEDS, CRGB::Black);
 
@@ -197,8 +197,8 @@ void FastLedEffects::backAndForthNoSmoothOneDot(int r, int g, int b, CRGB leds[]
     }
 }
 
-void FastLedEffects::backAndForthNoSmoothLengthedDot(int r, int g, int b, CRGB leds[], int long time, int length) {
-    EVERY_N_MILLISECONDS(time) {   // Update every 100 milliseconds
+void FastLedEffects::backAndForthNoSmoothLengthedDot(int r, int g, int b, CRGB leds[], int tid, int length) {
+    EVERY_N_MILLISECONDS(tid) {   // Update every 100 milliseconds
         // Turn off all LEDs
         fill_solid(leds, NUM_LEDS, CRGB::Black);
 
@@ -217,18 +217,18 @@ void FastLedEffects::backAndForthNoSmoothLengthedDot(int r, int g, int b, CRGB l
     }
 }
 
-void FastLedEffects::hueFading(int milliseconds, CRGB leds[]) {
+void FastLedEffects::hueFading(int tid, CRGB leds[]) {
     for (int i = 0; i < NUM_LEDS; i++) {
         leds[i] = CHSV(hue, 255, 255);
     }
-    EVERY_N_MILLISECONDS(10) {
+    EVERY_N_MILLISECONDS(tid) {
         hue++;
     }
     FastLED.show();
 }
 
-void FastLedEffects::hueWhiteWave(uint8_t hueInsert, int milliseconds, CRGB leds[]) {
-    EVERY_N_MILLISECONDS(milliseconds) {
+void FastLedEffects::hueWhiteWave(uint8_t hueInsert, int tid, CRGB leds[]) {
+    EVERY_N_MILLISECONDS(tid) {
         leds[0] = CHSV(hueInsert, random8(), random8(100, 255));
 
         for (int i = NUM_LEDS - 1; i > 0; i--) {
@@ -243,17 +243,17 @@ void FastLedEffects::displayPaletteLinear(CRGBPalette16 palette, CRGB leds[]) {
     FastLED.show();
 }
 
-void FastLedEffects::movingPaletteLinear(CRGBPalette16 palette, int milliseconds, CRGB leds[]) {
+void FastLedEffects::movingPaletteLinear(CRGBPalette16 palette, int tid, CRGB leds[]) {
     fill_palette(leds, NUM_LEDS, paletteIndex, 255/NUM_LEDS, palette, 100, LINEARBLEND);
-    EVERY_N_MILLISECONDS(milliseconds) {
+    EVERY_N_MILLISECONDS(tid) {
         paletteIndex++;
     }
     FastLED.show();
 }
 
 // Link: https://www.youtube.com/watch?v=Ukq0tH2Tnkc&list=PLgXkGn3BBAGi5dTOCuEwrLuFtfz0kGFTC&index=3
-void FastLedEffects::spotlightingPalette(CRGBPalette16 palette, int milliseconds, int fade, CRGB leds[]) {
-    EVERY_N_MILLISECONDS(milliseconds) {
+void FastLedEffects::spotlightingPalette(CRGBPalette16 palette, int tid, int fade, CRGB leds[]) {
+    EVERY_N_MILLISECONDS(tid) {
         leds[random(0, NUM_LEDS - 1)] = ColorFromPalette(palette, random8(), 255, LINEARBLEND);
     }
     fadeToBlackBy(leds, NUM_LEDS, fade);
@@ -310,13 +310,13 @@ void FastLedEffects::threeSinBeat8(int r1, int g1, int b1, int r2, int g2, int b
     FastLED.show();
 }
 
-void FastLedEffects::brightnessSinBeat8Palette(CRGBPalette16 palette, uint8_t bpm, int milliseconds, CRGB leds[]) {
+void FastLedEffects::brightnessSinBeat8Palette(CRGBPalette16 palette, uint8_t bpm, int tid, CRGB leds[]) {
     static int more = 0;
     uint8_t sinBeat = beatsin8(bpm, 0, 255, 0, 0);
     for (int i = 0; i < NUM_LEDS; i++) {
         leds[i] = ColorFromPalette(palette, (255/NUM_LEDS * i + more) % 255, sinBeat);
     }
-    EVERY_N_MILLISECONDS(10) {
+    EVERY_N_MILLISECONDS(tid) {
         more++;
     }
     FastLED.show();
@@ -373,35 +373,35 @@ void FastLedEffects::funkyRangeSinBeat8Two(int fade, CRGB color, CRGB leds[]) {
 
 }
 
-void FastLedEffects::movingFunkyPalette(CRGBPalette16 palette, int bpm1, int bpm2, CRGB leds[]) {
+void FastLedEffects::movingFunkyPalette(CRGBPalette16 palette, uint8_t bpm1, uint8_t bpm2, CRGB leds[]) {
     uint8_t beatA = beatsin8(bpm1, 0, 255);
     uint8_t beatB = beatsin8(bpm2, 0, 255);
     fill_palette(leds, NUM_LEDS, (beatA + beatB) / 2, 10, palette, 255, LINEARBLEND);
     FastLED.show();
 }
 
-void FastLedEffects::rainbowWave(int beat, int milliseconds, int fade, CRGB leds[]) {
-    uint8_t pos = map(beat8(beat, 0), 0, 255, 0, NUM_LEDS - 1);
+void FastLedEffects::rainbowWave(uint8_t bpm, int tid, int fade, CRGB leds[]) {
+    uint8_t pos = map(beat8(bpm, 0), 0, 255, 0, NUM_LEDS - 1);
     leds[pos] = CHSV(hue, 200, 255);
     fadeToBlackBy(leds, NUM_LEDS, fade);
-    EVERY_N_MILLISECONDS(milliseconds) {
+    EVERY_N_MILLISECONDS(tid) {
         hue++;
     }
     FastLED.show();
 }
 
-void FastLedEffects::choosenWave(int milliseconds, int fade, CRGB color, CRGB leds[]) {
+void FastLedEffects::choosenWave(int tid, int fade, CRGB color, CRGB leds[]) {
     uint8_t pos = map(beat8(40, 0), 0, 255, 0, NUM_LEDS - 1);
     std::vector<uint8_t> colors = FastLedEffects::getArrayRangeValue(FastLedEffects::CRGBToInt(color));
     leds[pos] = CHSV(map(hue, 0, 255, colors[0], colors[1]), 200, 255);
     fadeToBlackBy(leds, NUM_LEDS, fade);
-    EVERY_N_MILLISECONDS(milliseconds) {
+    EVERY_N_MILLISECONDS(tid) {
         hue++;
     }
     FastLED.show();
 }
 
-void FastLedEffects::firstNoiseRainbow(int bpm, CRGB leds[]) {
+void FastLedEffects::firstNoiseRainbow(uint8_t bpm, CRGB leds[]) {
     x = 0;
     scale = beatsin8(bpm, 10, 30); // bpm
     t = millis() / 5;
@@ -413,7 +413,7 @@ void FastLedEffects::firstNoiseRainbow(int bpm, CRGB leds[]) {
     FastLED.show();
 }
 
-void FastLedEffects::firstNoiseColor(CRGB color, int bpm, CRGB leds[]) {
+void FastLedEffects::firstNoiseColor(CRGB color, uint8_t bpm, CRGB leds[]) {
     x = 0;
     scale = beatsin8(bpm, 10, 30); // bpm
     t = millis() / 5;
@@ -469,16 +469,19 @@ void FastLedEffects::fillNoise16(CRGB leds[]) {
 }
 
 // Link : https://www.youtube.com/watch?v=r6vMdnqUjTk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=12
-void FastLedEffects::rainbowDave(int density, int delta, CRGB leds[]) {
+void FastLedEffects::rainbowDave(int density, int delta, int tid, CRGB leds[]) {
     // Here the density is the speed of the animation
-    fill_rainbow(leds, NUM_LEDS, initialHue += density, delta);
+    EVERY_N_MILLISECONDS(tid) {
+      fill_rainbow(leds, NUM_LEDS, initialHue += density, delta);
+    }
+  
     FastLED.show();
 }
 
 // Link : https://www.youtube.com/watch?v=r6vMdnqUjTk&list=PLF2KJ6Gy3cZ7ynsp8s4tnqEFmY15CKhmH&index=12
-void FastLedEffects::marqueeDave(int inter, int hueChanging, int length, CRGB leds[]) {
+void FastLedEffects::marqueeDave(int tid, int density, int length, CRGB leds[]) {
     static byte j = HUE_BLUE;
-    interval = inter;
+    interval = tid;
     static int scroll = 0;
     if (millis() - lastUpdate >= interval) {
         lastUpdate = millis();
@@ -488,7 +491,7 @@ void FastLedEffects::marqueeDave(int inter, int hueChanging, int length, CRGB le
 
         CRGB c;
         for (int i = 0; i < NUM_LEDS; i++) {
-            leds[i] = c.setHue(k+=hueChanging);
+            leds[i] = c.setHue(k+=density);
         }
         
         scroll++;
@@ -508,8 +511,8 @@ static const CRGB TwinkleColors [NUM_COLORS] = {
     CRGB::Green,
     CRGB::Orange
 };
-void FastLedEffects::twinkleOld(int inter, CRGB leds[]) {
-    interval = inter;
+void FastLedEffects::twinkleOld(int tid, CRGB leds[]) {
+    interval = tid;
     if (millis() - lastUpdate >= interval) {
         lastUpdate = millis();
         FastLED.clear(false);
@@ -520,8 +523,8 @@ void FastLedEffects::twinkleOld(int inter, CRGB leds[]) {
     }
 }
 
-void FastLedEffects::twinkle(int inter, CRGB leds[]) {
-    interval = inter;
+void FastLedEffects::twinkle(int tid, CRGB leds[]) {
+    interval = tid;
     if (millis() - lastUpdate >= interval) {
         lastUpdate = millis();
         static int passCount = 0;
@@ -536,17 +539,17 @@ void FastLedEffects::twinkle(int inter, CRGB leds[]) {
     }
 }
 
-void FastLedEffects::comet(int inter, int fade, int cometsize,  int delathue, CRGB leds[]) {
+void FastLedEffects::comet(int tid, int fade, int length,  int density, CRGB leds[]) {
 
     byte fadeAmt = fade;
-    int cometSize = cometsize;
-    int deltaHue = delathue;
+    int cometSize = length;
+    int deltaHue = density;
 
     static byte hueByte = HUE_RED;  // Current comet color
     static int iDirection = 1;      // Current direction
     static int iPos = 0;    // Current comet positon on the strip
 
-     interval = inter;
+     interval = tid;
     if (millis() - lastUpdate >= interval) {
         lastUpdate = millis();
         hueByte += deltaHue;  //Update comet color
@@ -572,18 +575,18 @@ void FastLedEffects::comet(int inter, int fade, int cometsize,  int delathue, CR
     }
 }
 
-void FastLedEffects::cometOnce(int inter, int fade, int cometsize,  int delathue,  double cometspeed, CRGB leds[]) {
+void FastLedEffects::cometOnce(int tid, int fade, int length,  int density,  double speed, CRGB leds[]) {
 
     byte fadeAmt = fade;
-    int cometSize = cometsize;
-    int deltaHue = delathue;
-    double cometSpeed = cometspeed;
+    int cometSize = length;
+    int deltaHue = density;
+    double cometSpeed = speed;
 
     static byte hueByte = HUE_RED;  // Current comet color
     static int iDirection = 1;      // Current direction
     static double iPos = 0.0;    // Current comet positon on the strip
 
-    interval = inter;
+    interval = tid;
     if (millis() - lastUpdate >= interval) {
         lastUpdate = millis();
         hueByte += deltaHue;  //Update comet color
@@ -653,69 +656,69 @@ void FastLedEffects::fire(int size, int cooling, int sparking, int sparks, int s
 }
 
 // Link : https://github.com/netmindz/arduino/blob/master/Deevstock/CloudsV3/CloudsV3.ino
-void FastLedEffects::storm(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGB leds[]) {
+void FastLedEffects::storm(int chance, int length, int tid, int fade, CRGB leds[]) {
   // clusters of leds, souce of
-  if (random(0, CHANCE) == 0) {
+  if (random(0, chance) == 0) {
     for (int i = 0; i < random(1, NUM_LEDS); i++) {
       int r = random16(NUM_LEDS);
-      for (int j = 0; j < random(1, CLUSTER); j++) {
+      for (int j = 0; j < random(1, length); j++) {
         if ((r + j) <  NUM_LEDS) {
           leds[(r + j)] = CHSV(random(0, 255), 100, 255);
         }
       }
     }
   }
-  FastLED.delay(SPEED);
-  fadeToBlackBy(leds, NUM_LEDS, FADE);
+  FastLED.delay(tid);
+  fadeToBlackBy(leds, NUM_LEDS, fade);
 }
 
-void FastLedEffects::stormColored(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGB color, CRGB leds[]) {
+void FastLedEffects::stormColored(int chance, int length, int tid, int fade, CRGB color, CRGB leds[]) {
     uint32_t convertedColor = FastLedEffects::CRGBToInt(color);
     uint8_t colBeat = FastLedEffects::getBeatSinColor(convertedColor);
     // clusters of leds, souce of
-  if (random(0, CHANCE) == 0) {
+  if (random(0, chance) == 0) {
     for (int i = 0; i < random(1, NUM_LEDS); i++) {
       int r = random16(NUM_LEDS);
-      for (int j = 0; j < random(1, CLUSTER); j++) {
+      for (int j = 0; j < random(1, length); j++) {
         if ((r + j) <  NUM_LEDS) {
           leds[(r + j)] = CHSV(colBeat, 100, 255);
         }
       }
     }
   }
-  FastLED.delay(SPEED);
-  fadeToBlackBy(leds, NUM_LEDS, FADE);
+  FastLED.delay(tid);
+  fadeToBlackBy(leds, NUM_LEDS, fade);
 }
 
-void FastLedEffects::stormPalette(int CHANCE, int CLUSTER, int SPEED, int FADE, CRGBPalette16 palette, CRGB leds[]) {
-    if (random(0, CHANCE) == 0) {
+void FastLedEffects::stormPalette(int chance, int length, int tid, int fade, CRGBPalette16 palette, CRGB leds[]) {
+    if (random(0, chance) == 0) {
     for (int i = 0; i < random(1, NUM_LEDS); i++) {
       int r = random16(NUM_LEDS);
-      for (int j = 0; j < random(1, CLUSTER); j++) {
+      for (int j = 0; j < random(1, length); j++) {
         if ((r + j) <  NUM_LEDS) {
           leds[(r + j)] = ColorFromPalette(palette, random8(), 255, LINEARBLEND);
         }
       }
     }
   }
-  FastLED.delay(SPEED);
-  fadeToBlackBy(leds, NUM_LEDS, FADE);
+  FastLED.delay(tid);
+  fadeToBlackBy(leds, NUM_LEDS, fade);
 }
 
 // Link : https://github.com/netmindz/arduino/blob/master/Deevstock/CloudsV3/CloudsV3.ino
-void FastLedEffects::lighting(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB leds[]) {
+void FastLedEffects::lighting(int ledstart, int length, int flashes, int dimmer, int frequency, CRGB leds[]) {
         ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
-        ledlen = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
+        length = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
 
         EVERY_N_MILLISECONDS(1000 / frequency) {
             for (int flashCounter = 0; flashCounter < random8(3, flashes); flashCounter++) {
                 if (flashCounter == 0) dimmer = 5;                        // the brightness of the leader is scaled down by a factor of 5
                 else dimmer = random8(1, 3);                              // return strokes are brighter than the leader
 
-                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 255 / dimmer));
+                fill_solid(leds + ledstart, length, CHSV(255, 0, 255 / dimmer));
                 FastLED.show();                                           // Show a section of LED's
                 delay(random8(4, 10));                                    // each flash only lasts 4-10 milliseconds
-                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 0));     // Clear the section of LED's
+                fill_solid(leds + ledstart, length, CHSV(255, 0, 0));     // Clear the section of LED's
                 FastLED.show();
 
                 if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
@@ -725,23 +728,23 @@ void FastLedEffects::lighting(int ledstart, int ledlen, int flashes, int dimmer,
         }
 }
 
-void FastLedEffects::lightingColored(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGB color, CRGB leds[]) {
+void FastLedEffects::lightingColored(int ledstart, int length, int flashes, int dimmer, int frequency, CRGB color, CRGB leds[]) {
 
         uint32_t convertedColor = FastLedEffects::CRGBToInt(color);
         uint8_t colBeat = FastLedEffects::getBeatSinColor(convertedColor);
 
         ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
-        ledlen = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
+        length = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
 
         EVERY_N_MILLISECONDS(1000 / frequency) {
             for (int flashCounter = 0; flashCounter < random8(3, flashes); flashCounter++) {
                 if (flashCounter == 0) dimmer = 5;                        // the brightness of the leader is scaled down by a factor of 5
                 else dimmer = random8(1, 3);                              // return strokes are brighter than the leader
 
-                fill_solid(leds + ledstart, ledlen, CHSV(colBeat, 255, 255 / dimmer));
+                fill_solid(leds + ledstart, length, CHSV(colBeat, 255, 255 / dimmer));
                 FastLED.show();                                           // Show a section of LED's
                 delay(random8(4, 10));                                    // each flash only lasts 4-10 milliseconds
-                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 0));     // Clear the section of LED's
+                fill_solid(leds + ledstart, length, CHSV(255, 0, 0));     // Clear the section of LED's
                 FastLED.show();
 
                 if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
@@ -751,19 +754,19 @@ void FastLedEffects::lightingColored(int ledstart, int ledlen, int flashes, int 
         }
 }
 
-void FastLedEffects::lightingPalette(int ledstart, int ledlen, int flashes, int dimmer, int frequency, CRGBPalette16 palette, CRGB leds[]) {
+void FastLedEffects::lightingPalette(int ledstart, int length, int flashes, int dimmer, int frequency, CRGBPalette16 palette, CRGB leds[]) {
         ledstart = random8(NUM_LEDS);                               // Determine starting location of flash
-        ledlen = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
+        length = random8(NUM_LEDS - ledstart);                      // Determine length of flash (not to go beyond NUM_LEDS-1)
 
         EVERY_N_MILLISECONDS(1000 / frequency) {
             for (int flashCounter = 0; flashCounter < random8(3, flashes); flashCounter++) {
                 if (flashCounter == 0) dimmer = 5;                        // the brightness of the leader is scaled down by a factor of 5
                 else dimmer = random8(1, 3);                              // return strokes are brighter than the leader
 
-                fill_solid(leds + ledstart, ledlen, ColorFromPalette(palette, random8(), 255, LINEARBLEND));
+                fill_solid(leds + ledstart, length, ColorFromPalette(palette, random8(), 255, LINEARBLEND));
                 FastLED.show();                                           // Show a section of LED's
                 delay(random8(4, 10));                                    // each flash only lasts 4-10 milliseconds
-                fill_solid(leds + ledstart, ledlen, CHSV(255, 0, 0));     // Clear the section of LED's
+                fill_solid(leds + ledstart, length, CHSV(255, 0, 0));     // Clear the section of LED's
                 FastLED.show();
 
                 if (flashCounter == 0) delay (150);                       // longer delay until next flash after the leader
@@ -774,14 +777,14 @@ void FastLedEffects::lightingPalette(int ledstart, int ledlen, int flashes, int 
 }
 
 // Link: https://github.com/marmilicious/FastLED_examples/blob/master/beat8.ino
-void FastLedEffects::beat8_tail(int moveSpeed, int fadeRate, CRGB leds[]) {
+void FastLedEffects::beat8_tail(uint8_t bpm, int fadeRate, CRGB leds[]) {
     static uint8_t hueBeat = 0;
     EVERY_N_MILLISECONDS( 50 ) { hueBeat++; }
 
     EVERY_N_MILLISECONDS( 5 ) {
     fadeToBlackBy( leds, NUM_LEDS, fadeRate);  // Fade out pixels.
     }
-    uint16_t pos = beat8(moveSpeed) % NUM_LEDS;  // modulo the position to be within NUM_LEDS
+    uint16_t pos = beat8(bpm) % NUM_LEDS;  // modulo the position to be within NUM_LEDS
     leds[pos] = CHSV( hueBeat, 200, 255);
 
     FastLED.show();
@@ -789,18 +792,18 @@ void FastLedEffects::beat8_tail(int moveSpeed, int fadeRate, CRGB leds[]) {
 }
 
 
-void FastLedEffects::blendIntoRainbow(int waitTime, int colorTime, CRGB leds[]) {
+void FastLedEffects::blendIntoRainbow(int tid, int tid2, CRGB leds[]) {
 
-    EVERY_N_MILLISECONDS(waitTime){
+    EVERY_N_MILLISECONDS(tid){
         hue++;  //used to cycle through the rainbow
     }
 
-    EVERY_N_MILLISECONDS(waitTime + 30) {
+    EVERY_N_MILLISECONDS(tid + 30) {
         pos++;
         if (pos == NUM_LEDS) { pos = 0; }  //reset to begining
     }
 
-    EVERY_N_MILLISECONDS(colorTime){
+    EVERY_N_MILLISECONDS(tid2){
         hue2 = hue2 - 1;  //used to change the moving color
     }
     CRGB blendThisIn  = CHSV(hue2, 170, 255);  //color to blend into the background
@@ -843,8 +846,8 @@ void FastLedEffects::breatheV2(float pulseSp, CRGB leds[]) {
 }
 
 
-void FastLedEffects::chaseTargetTalesVarA(int time, CRGB leds[]) {
-    EVERY_N_MILLISECONDS(time) {
+void FastLedEffects::chaseTargetTalesVarA(int tid, CRGB leds[]) {
+    EVERY_N_MILLISECONDS(tid) {
         // Assign random target values whenever count is zero.
         if (countOff == 0){
             for (int i=0; i < NUM_LEDS; i++){
@@ -885,9 +888,9 @@ void FastLedEffects::chaseTargetTalesVarA(int time, CRGB leds[]) {
 }
 
 
-void FastLedEffects::chaseTargetTalesVarB(int time, CRGB leds[]) {
+void FastLedEffects::chaseTargetTalesVarB(int tid, CRGB leds[]) {
     lowCutoff = 30;
-    EVERY_N_MILLISECONDS(time) {
+    EVERY_N_MILLISECONDS(tid) {
                 // Assign random target values whenever count is zero.
         if (countOff == 0){
             for (int i=0; i < NUM_LEDS; i++){
@@ -953,7 +956,7 @@ void FastLedEffects::chaseTargetTalesVarB(int time, CRGB leds[]) {
 }
 
 
-void FastLedEffects::chaseTargetTalesVarC(int boilingTime, int smoothFading, int fade, CRGB leds[]) {
+void FastLedEffects::chaseTargetTalesVarC(int boilingTime, int tid, int fadeTime, CRGB leds[]) {
     // Normal values : Boiling from 200 to 2000, fade was 70, smoothfading was 50
     hue_high = 0;  // red for high values with,
     hue_low = 96;  // green for low values.
@@ -974,7 +977,7 @@ void FastLedEffects::chaseTargetTalesVarC(int boilingTime, int smoothFading, int
   }//end assign new target values
 
 
-  EVERY_N_MILLISECONDS(smoothFading) {
+  EVERY_N_MILLISECONDS(tid) {
     for (uint8_t i=0; i < NUM_LEDS; i++){
       // Check current values against target values.
       if (leds_vu[i].value < target[i]){  // less then the target, so fade up.
@@ -1016,7 +1019,7 @@ void FastLedEffects::chaseTargetTalesVarC(int boilingTime, int smoothFading, int
   }//end EVERY_N*
 
   // Continuosly fade target to zero.
-  EVERY_N_MILLISECONDS(fade) {
+  EVERY_N_MILLISECONDS(fadeTime) {
     for (int j=0; j < NUM_LEDS; j++){
       if (target[j] > lowCutoff){
         target[j] -= 1;  // Fade by this amount.
@@ -1247,10 +1250,10 @@ void FastLedEffects::heartPulseBloodFlowing(CRGB leds[]) {
   FastLED.show();
 }
 
-void FastLedEffects::lighthouseBeaconV2(int width, uint16_t time, uint8_t fadeRate, CRGB leds[]) {
+void FastLedEffects::lighthouseBeaconV2(int length, int tid, int fade, CRGB leds[]) {
     sat = 190;
     hue = 42;
-    EVERY_N_MILLISECONDS(time) {  // wait a bit before micro advancing
+    EVERY_N_MILLISECONDS(tid) {  // wait a bit before micro advancing
     if (delta > 0) {
       pixelPos += deltaInt;
     } else {
@@ -1266,7 +1269,7 @@ void FastLedEffects::lighthouseBeaconV2(int width, uint16_t time, uint8_t fadeRa
     countdown -= 1;  // decrement once each time through
 
     memset8( leds, 0, NUM_LEDS * sizeof(CRGB));  // Clear the pixel buffer
-    drawFractionalBar( pixelPos, width, hue, fadeRate, leds);  // Draw the pixels
+    drawFractionalBar( pixelPos, length, hue, fade, leds);  // Draw the pixels
   }
 
   FastLED.show();  // Show the pixels
@@ -1346,7 +1349,7 @@ void FastLedEffects::matchingGlitter4(bool more, CRGB leds[]) {
     FastLED.show();
 }
 
-void FastLedEffects::mirrorFadeEnds(int fadeOver, CRGB leds[]) {
+void FastLedEffects::mirrorFadeEnds(int fade, CRGB leds[]) {
     // It's not the best effect of the list but jebiga
     // Here fadeOver is 7 as a base
 
@@ -1356,8 +1359,8 @@ void FastLedEffects::mirrorFadeEnds(int fadeOver, CRGB leds[]) {
         leds[NUM_LEDS - 1 - i] = leds[i];
     }
 
-    uint8_t fadePP = 255 / fadeOver;  // fade per pixel
-    for (uint8_t i = 0; i < fadeOver + 1; i++) {
+    uint8_t fadePP = 255 / fade;  // fade per pixel
+    for (uint8_t i = 0; i < fade + 1; i++) {
         uint8_t fadeAmmount = (255 - (fadePP * i));
         leds[i].fadeToBlackBy(fadeAmmount);
         leds[NUM_LEDS - 1 - i].fadeToBlackBy(fadeAmmount);
@@ -1367,9 +1370,9 @@ void FastLedEffects::mirrorFadeEnds(int fadeOver, CRGB leds[]) {
     FastLED.show();
 }
 
-void FastLedEffects::Fire2012(int time, int cooling, int sparking, CRGB leds[]) {
+void FastLedEffects::Fire2012(int tid, int cooling, int sparking, CRGB leds[]) {
   // cooling is 90, sparking 50, and time around 15 I think
-  EVERY_N_MILLISECONDS(time) {
+  EVERY_N_MILLISECONDS(tid) {
     // Array of temperature readings at each simulation cell
     static byte heat[NUM_LEDS];
     // Step 1.  Cool down every cell a little
@@ -1435,7 +1438,7 @@ void FastLedEffects::Fire2012_halfStrip(int time, int cooling, int sparking, boo
 }
  
 
-void FastLedEffects::movingColoredBar(CRGBPalette16 palette, CRGB leds[], int colorBarLength, int frameDelay) {
+void FastLedEffects::movingColoredBar(CRGBPalette16 palette, CRGB leds[], int length, uint8_t frameDelay) {
     // Adjust framde delay if you want it to be more frequent
     int numberofColors = sizeof(palette)/sizeof(long);
     EVERY_N_MILLISECONDS(frameDelay) {
@@ -1448,14 +1451,14 @@ void FastLedEffects::movingColoredBar(CRGBPalette16 palette, CRGB leds[], int co
         leds[NUM_LEDS-1] = palette[paletteIndexmcb];
         barPosition++;
         // check and reset things as needed
-        if ( (barPosition > colorBarLength) && (paletteIndexmcb == numberofColors-1) )
+        if ( (barPosition > length) && (paletteIndexmcb == numberofColors-1) )
         {
         barPosition = 1;
         //Serial.println("  barPosition reset");
         paletteIndexmcb = 0;
         //Serial.println("  paletteIndex reset");
         }
-        else if (barPosition > colorBarLength)
+        else if (barPosition > length)
         {
         barPosition = 1;
         //Serial.println("  barPosition reset");
@@ -1465,14 +1468,14 @@ void FastLedEffects::movingColoredBar(CRGBPalette16 palette, CRGB leds[], int co
   FastLED.show();
 }
 
-void FastLedEffects::repeatingPattern(int time1, int time2, int fade, CRGB leds[]) {
+void FastLedEffects::repeatingPattern(int tid, int tid2, int fade, CRGB leds[]) {
     // Time1 is 50 usually nd time2 is 1000, fade is 7
 
-    EVERY_N_MILLISECONDS(time1) {
+    EVERY_N_MILLISECONDS(tid) {
     fadeToBlackBy( leds, NUM_LEDS, fade);  // slowly fade out pixels
   }
 
-  EVERY_N_MILLISECONDS(time2) {
+  EVERY_N_MILLISECONDS(tid2) {
     static uint8_t hueOffset;
     static uint8_t hueShift;
     
@@ -1499,8 +1502,9 @@ void FastLedEffects::repeatingPattern(int time1, int time2, int fade, CRGB leds[
 
 }
 
-void FastLedEffects::savedPixel(int time, CRGB leds[]) {
-    EVERY_N_MILLISECONDS_I(timingObj, time) {
+void FastLedEffects::savedPixel(int tid, int tid2,  CRGB leds[]) {
+  // tid2 should be 8
+    EVERY_N_MILLISECONDS_I(timingObj, tid) {
     uint8_t n = random8(1,5);
     for (uint8_t i = 0; i < n; i++) {    
       uint8_t p = random8(NUM_LEDS);
@@ -1511,7 +1515,7 @@ void FastLedEffects::savedPixel(int time, CRGB leds[]) {
     timingObj.setPeriod(random16(150,600));  // random time to display next new pixel
   }
 
-  EVERY_N_MILLISECONDS(8) {
+  EVERY_N_MILLISECONDS(tid2) {
     for (uint8_t i = 0; i < NUM_LEDS; i++) {
       if (pData[i]) {  // true if there is data
 
