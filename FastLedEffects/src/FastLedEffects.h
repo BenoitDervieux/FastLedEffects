@@ -85,7 +85,10 @@ class FastLedEffects {
         /*  67 */ static void savedPixel(int tid, int tid2,  CRGB leds[]);
         /*  68 */ static void sinCosLinear(CRGB leds[]); // --> Need to add color option
         /*  69 */ static void sparkles(CRGB leds[], int sparkel_duration = random(80, 200), int sparkel_amount = 100, int sparkel_spread = 30);
-        /*  70 */
+        
+        
+        // Fetch from reddit : https://www.reddit.com/r/FastLED/comments/1fjzmfc/bar_shelves/
+        /*  70 */ static void shelf(CRGB leds[], int speedDrop = 5, float fpsDrop = 0.08, int spacingDrop = 10, int particlesDrop = 6, float rowDelayDrop = 0.50);
         
     
 
@@ -98,6 +101,8 @@ class FastLedEffects {
         static int sumPulse(int time_shift);
         static uint8_t pulseWave8(uint32_t ms, uint16_t cycleLength, uint16_t pulseLength);
         static void drawFractionalBar( int pos16, int width, uint8_t hue, uint8_t fadeRate, CRGB leds[]);
+        static int id(int row, int col);
+
     
     private:
         int red;

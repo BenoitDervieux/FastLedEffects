@@ -1627,6 +1627,33 @@ void FastLedEffects::sparkles(CRGB leds[], int sparkel_duration, int sparkel_amo
     FastLED.show();
 }
 
+void FastLedEffects::shelf(CRGB leds[], int speedDrop, float fpsDrop, int spacingDrop, int particlesDrop, float rowDelayDrop) {
+  // Taken from Reddit : https://www.reddit.com/r/FastLED/comments/1fjzmfc/bar_shelves/
+  // Pastebin: https://pastebin.com/07bU3p9r
+  
+  // int speedDrop = 5;
+  // float fpsDrop = 0.08;
+  // int spacingDrop = 10;
+  // int particlesDrop = 6;
+  // float rowDelayDrop = 0.50;
+  
+  
+  for (float i = 0; i < 6.0; i += fpsDrop) {
+        int position[particlesDrop];
+        for (int k = 0; k < 4; k++) {
+        for (int j = 0; j < particlesDrop; j++) {
+          position[j] = (int) ((89-(j*spacingDrop))*(i-rowDelayDrop*k) - ((22.25-(j*1.25)) * (i-rowDelayDrop*k)*(i-rowDelayDrop*k)));
+            if (position[j] > 0 && position[j]) {
+            leds[FastLedEffects::id(k, position[j])] = CRGB((int) 150.0 *((float) j/(float) particlesDrop), (int) 150.0 *((float) j/(float) particlesDrop), 255);
+            }
+          }
+        }
+        FastLED.show();
+        delay(speedDrop);
+        FastLED.clear();
+  }
+}
+
 
 //+---------------------------------------------------------------------------------
 // 
@@ -1839,4 +1866,8 @@ void FastLedEffects::drawFractionalBar( int pos16, int width, uint8_t hue, uint8
     i++;
     if( i == NUM_LEDS) i = 0; // wrap around
   }
+}
+
+int FastLedEffects::id(int row, int col) {
+  return col + 90*row;
 }

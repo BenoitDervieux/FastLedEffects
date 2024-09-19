@@ -28,6 +28,7 @@ void setup() {
 
 void loop() {
   CRGBPalette16 myPal = lavaPalette;
+
   // FastLedEffects::blink(255, 141, 0, leds, 50);
   // FastLedEffects::backAndForthNoSmoothOneDot(255, 141, 0, leds, 15);
   // FastLedEffects::backAndForthNoSmoothLengthedDot(255, 141, 0, leds, 30, 3);
@@ -74,7 +75,7 @@ void loop() {
   // FastLedEffects::fillUpStrip(leds);
   // FastLedEffects::heartBeat2(1100, 180, leds);
   // FastLedEffects::heartPulseBloodFlowing(leds);
-  FastLedEffects::lighthouseBeaconV2(4, 10, 0, leds);
+  // FastLedEffects::lighthouseBeaconV2(4, 10, 0, leds);
   // FastLedEffects::matchingGlitter4(true, leds);
   // FastLedEffects::Fire2012_halfStrip(30, 90, 50, true, leds);
   // FastLedEffects::movingColoredBar(myPal, leds, 3, 40);
